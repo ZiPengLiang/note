@@ -129,7 +129,7 @@ Object.isSealed(obj) --返回obj是否被封闭。
 
 临时死区（Temporal Dead Zone），简称TDZ
 
-在javascript引擎扫描变量声明的时候，大致会将所扫描到的变量进行2中操作，要么将其提升到作用于顶部（var 声明），要么将变量放到TDZ中（let 和const）。当TDZ中的变量被访问的时候，会报错，当变量被声明后才被移除TDZ。
+在javascript引擎扫描变量声明的时候，大致会将所扫描到的变量进行两种操作，要么将其提升到作用于顶部（var 声明），要么将变量放到TDZ中（let 和const）。当TDZ中的变量被访问的时候，会报错，当变量被声明后才被移除TDZ。
 
 举个例子
 
