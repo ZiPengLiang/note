@@ -171,6 +171,8 @@ Promise.race([p5,p6]).then(res=>{
 
 
 
+
+
 ### Promise.prototype
 
 ##### 	属性：
@@ -181,17 +183,40 @@ Promise.race([p5,p6]).then(res=>{
 
 ##### 	方法
 
-1、Promise.prototype.catch()
+###### 1、Promise.prototype.catch()
 
 ​	添加一个拒绝(rejection) 回调到当前 promise, 返回一个新的promise。当这个回调函数被调用，新 promise 将以它的返回值来resolve，否则如果当前promise 进入fulfilled状态，则以当前promise的完成结果作为新promise的完成结果.
 
-2、Promise.prototype.then()
+###### 2、Promise.prototype.then()
 
 ​	添加解决(fulfillment)和拒绝(rejection)回调到当前 promise, 返回一个新的 promise, 将以回调的返回值来resolve
 
-3、Promise.prototype.finally()
+###### 3、Promise.prototype.finally()
 
 ​	添加一个事件处理回调于当前promise对象，并且在原promise对象解析完毕后，返回一个新的promise对象。回调会在当前promise运行完毕后被调用，无论当前promise的状态是完成(fulfilled)还是失败(rejected)
+
+
+
+
+
+### 问题：
+
+#### 1.当promise进入到then内部时，当内部的方法出现错误的时候，catch也会捕抓到
+
+```javascript
+p1.then(function(value) {
+  console.log(value); // "Success!"
+  throw 'oh, no!';
+}).catch(function(e) {
+  console.log(e); // "oh, no!"
+}).then(function(){
+  console.log('after a catch the chain is restored');
+}, function () {
+  console.log('Not fired due to the catch');
+});
+```
+
+
 
 
 
