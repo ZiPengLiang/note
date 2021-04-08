@@ -381,4 +381,78 @@ Vue.component('my-component', {
 　父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
 ```
 
-https://juejin.cn/post/6930897845369356295#heading-10
+
+
+## 12、Vue组件通信
+
+### 1.prop/$emit
+
+父组件：通过`prop`的方式向子组件传递数据
+
+子组件：通过`$emit`可以向父组件通信。
+
+优点：
+
+​	传值取值方便简洁明了
+
+缺点：
+
+1. 由于数据是单向传递，如果子组件需要改变父组件的props值每次需要给子组件绑定对应的监听事件。
+2. 如果父组件需要给孙组件传值，需要子组件进行转发，较为不便。
+
+
+
+### 2.$parent/$children
+
+在子组件中通过`$parent`调用了父组件的函数，并在父组件通过`$children`获取子组件实例的数组
+
+### 3.provide/inject
+
+父组件中通过provide来提供变量, 然后再子组件中通过inject来注入变量。这里inject注入的变量不像`$attrs`，只能向下一层；inject不论子组件嵌套有多深，都能获取到。
+
+### 4.$attrs/$listeners
+
+跨一级传输数据
+
+### 5.vuex
+
+vuex实现了单向的数据流，在全局定义了一个State对象用来存储数据，当组件要修改State中的数据时，必须通过Mutation进行操作。
+
+### 6.$refs
+
+用在子组件上，获取的就是组件的实例对象。获取组件实例，调用组件的属性、方法
+
+###  7.Event Bus
+
+跨组件通信` Event Bus` （Vue.prototype.bus = new Vue）其实基于*b**u**s*=*n**e**w**V**u**e*）其实基于on与$emit
+
+### 常见使用场景分为以下三类:
+
+- 父子组件通信: props; $parent/$children; provide/inject; $ref; $attrs/$listeners
+- 兄弟组件通信: EventBus; Vuex
+- 跨级通信: EventBus; Vuex; provide/inject; $attrs/$listeners
+
+详细：[vue组件通信](E:\随手笔记\Vue\vue组件通信.md)
+
+## 13.Vuex 工作原理
+
+Vuex 是一个专为 Vue.js 应用程序开发的**状态管理模式**。
+
+状态自管理应用包含以下几个部分：
+
+- state，驱动应用的数据源；
+
+- view，以声明方式将 state 映射到视图；
+
+- actions，响应在 view 上的用户输入导致的状态变化。下图单向数据流示意图：
+
+  <img src="C:\Users\kx\Pictures\Screenshots\flow.png" alt="flow" style="zoom:30%;" />
+
+  vuex，多组件共享状态，因-单向数据流简洁性很容易被破坏：
+
+  - 多个视图依赖于同一状态。
+  - 来自不同视图的行为需要变更同一状态。
+
+  ![vuex](C:\Users\kx\Pictures\Screenshots\vuex.png)
+
+
