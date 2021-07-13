@@ -2,15 +2,21 @@
 
 vue.js通过简单的API（应用程序编程接口）提供高效的数据绑定和灵活的组件系统。
 
+## 0、Vuejs特点
+
 Vue.js的特性如下：
 
 1.轻量级的框架
 
 2.双向数据绑定
 
-3.指令
+3.指令系统
 
-4.插件化
+4.组件化
+
+5.客户端路由
+
+6.状态管理
 
 ## **1、与AngularJS的区别**
 
@@ -154,11 +160,9 @@ MVP 模式将 Controller 改名为 Presenter，同时改变了通信方向。
 
 MVVM 模式将 Presenter 改名为 ViewModel，基本上与 MVP 模式完全一致。
 
-M： model （数据层，也就是指数据（前端是js））
-
-V：view ( 也就是指DOM层 或用户界面 )
-
-VM : view-model (处理数据和界面的中间层)
+- Model：模型层，负责处理业务逻辑以及和服务器端进行交互--服务器请求
+- View：视图层，负责将数据模型转化为UI展示出来，可以简单的理解为HTML页面 --视图
+- ViewModel：视图模型层，用来连接Model和View，是Model和View之间的通信桥梁 -- JS、数据，对数据进行二次封装
 
 唯一的区别是，它采用双向绑定（data-binding）：View的变动，自动反映在 ViewModel，反之亦然
 
@@ -353,7 +357,7 @@ Vue.component('my-component', {
 
 ### **ajax放在哪个生命周期？**
 
-一般放在` mounted` 中，保证逻辑统一性，因为生命周期是同步执行的，` ajax` 是异步执行的。单数服务端渲染` ssr` 同一放在` created` 中，因为服务端渲染不支持` mounted` 方法。
+一般放在` mounted` 中，保证逻辑统一性，因为生命周期是同步执行的，` ajax` 是异步执行的。单数服务端渲染 ` ssr` 同一放在` created` 中，因为服务端渲染不支持` mounted` 方法。
 
 ###  **什么时候使用beforeDestroy？**
 
@@ -455,4 +459,94 @@ Vuex 是一个专为 Vue.js 应用程序开发的**状态管理模式**。
 
   ![vuex](C:\Users\kx\Pictures\Screenshots\vuex.png)
 
+
+
+## 14.虚拟DOM的理解
+
+实际上它只是一层对真实`DOM`的抽象，以`JavaScript` 对象 (`VNode` 节点) 作为基础的树，用对象的属性来描述节点，最终可以通过一系列操作使这棵树映射到真实环境上
+
+在`Javascript`对象中，虚拟`DOM` 表现为一个 `Object`对象。并且最少包含标签名 (`tag`)、属性 (`attrs`) 和子元素对象 (`children`) 三个属性，不同框架对这三个属性的名命可能会有差别
+
+例子：
+
+定义真实`DOM`
+
+```html
+<div id="app">
+    <p class="p">节点内容</p>
+    <h3>{{ foo }}</h3>
+</div>
+```
+
+实例化vue
+
+```js
+const app = new Vue({
+    el:"#app",
+    data:{
+        foo:"foo"
+    }
+})
+```
+
+观察`render`的`render`，得到虚拟`DOM`
+
+```js
+(function anonymous(
+) {
+	with(this){return _c('div',{attrs:{"id":"app"}},[_c('p',{staticClass:"p"},
+					  [_v("节点内容")]),_v(" "),_c('h3',[_v(_s(foo))])])}})
+```
+
+通过`VNode`，`vue`可以对这颗抽象树进行创建节点,删除节点以及修改节点的操作， 经过`diff`算法得出一些需要修改的最小单位,再更新视图，减少了`dom`操作，提高了性能
+
+
+
+## 15.diff算法
+
+`diff` 算法是一种通过同层的树节点进行比较的高效算法
+
+特点：
+
+- 比较只会在同层级进行, 不会跨层级比较
+- 在diff比较的过程中，循环从两边向中间比较
+
+`diff` 算法的在很多场景下都有应用，在 `vue` 中，作用于虚拟 `dom` 渲染成真实 `dom` 的新旧 `VNode` 节点比较
+
+### 比较方式：
+
+深度优先，同层比较
+
+1. 比较只会在同层级进行, 不会跨层级比较
+
+1. 比较的过程中，循环从两边向中间收拢
+
+比较实例：[你了解vue的diff算法吗](https://vue3js.cn/interview/vue/diff.html#%E4%BA%8C%E3%80%81%E6%AF%94%E8%BE%83%E6%96%B9%E5%BC%8F)
+
+流程：
+
+- 当数据发生改变时，订阅者`watcher`就会调用`patch`给真实的`DOM`打补丁
+
+- 通过`isSameVnode`进行判断，相同则调用`patchVnode`方法
+
+- ```
+  patchVnode
+  ```
+
+  做了以下操作：
+
+  - 找到对应的真实`dom`，称为`el`
+  - 如果都有都有文本节点且不相等，将`el`文本节点设置为`Vnode`的文本节点
+  - 如果`oldVnode`有子节点而`VNode`没有，则删除`el`子节点
+  - 如果`oldVnode`没有子节点而`VNode`有，则将`VNode`的子节点真实化后添加到`el`
+  - 如果两者都有子节点，则执行`updateChildren`函数比较子节点
+
+- ```
+  updateChildren
+  ```
+
+  主要做了以下操作：
+
+  - 设置新旧`VNode`的头尾指针
+  - 新旧头尾指针进行比较，循环向中间靠拢，根据情况调用`patchVnode`进行`patch`重复流程、调用`createElem`创建一个新节点，从哈希表寻找 `key`一致的`VNode` 节点再分情况操作
 
