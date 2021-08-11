@@ -494,8 +494,18 @@ const app = new Vue({
 ```js
 (function anonymous(
 ) {
-	with(this){return _c('div',{attrs:{"id":"app"}},[_c('p',{staticClass:"p"},
-					  [_v("节点内容")]),_v(" "),_c('h3',[_v(_s(foo))])])}})
+	with(this){
+        return _c('div',
+        {
+            attrs:{"id":"app"}
+        },
+        [_c('p',
+            {
+            	staticClass:"p"
+        	},
+			[_v("节点内容")]),
+         	_v(" "),
+         	_c('h3',[_v(_s(foo))])])}})
 ```
 
 通过`VNode`，`vue`可以对这颗抽象树进行创建节点,删除节点以及修改节点的操作， 经过`diff`算法得出一些需要修改的最小单位,再更新视图，减少了`dom`操作，提高了性能
