@@ -2081,3 +2081,817 @@ export function getBindingAttr (
 然后关键的来了`parseFilters`函数究竟是用来干什么的？
 
 `parseFilters` 函数的作用就像它的名字一样，是用来解析过滤器的，换句话说在编写绑定的属性时可以使用过滤器
+
+比如：
+
+```html
+<div :key="id | featId"></div>
+```
+
+像这种用到了计算的值，为了让其拥有使用过滤器的能力，就需要使用 `parseFilters` 函数处理。
+
+### `parseFilters`函数
+
+```js
+export function parseFilters (exp: string): string {
+  let inSingle = false
+  let inDouble = false
+  let inTemplateString = false
+  let inRegex = false
+  let curly = 0
+  let square = 0
+  let paren = 0
+  let lastFilterIndex = 0
+  let c, prev, i, expression, filters
+
+  for (i = 0; i < exp.length; i++) {
+    prev = c
+    c = exp.charCodeAt(i)
+    if (inSingle) {
+      if (c === 0x27 && prev !== 0x5C) inSingle = false
+    } else if (inDouble) {
+      if (c === 0x22 && prev !== 0x5C) inDouble = false
+    } else if (inTemplateString) {
+      if (c === 0x60 && prev !== 0x5C) inTemplateString = false
+    } else if (inRegex) {
+      if (c === 0x2f && prev !== 0x5C) inRegex = false
+    } else if (
+      c === 0x7C && // pipe
+      exp.charCodeAt(i + 1) !== 0x7C &&
+      exp.charCodeAt(i - 1) !== 0x7C &&
+      !curly && !square && !paren
+    ) {
+      if (expression === undefined) {
+        // first filter, end of expression
+        lastFilterIndex = i + 1
+        expression = exp.slice(0, i).trim()
+      } else {
+        pushFilter()
+      }
+    } else {
+      switch (c) {
+        case 0x22: inDouble = true; break         // "
+        case 0x27: inSingle = true; break         // '
+        case 0x60: inTemplateString = true; break // `
+        case 0x28: paren++; break                 // (
+        case 0x29: paren--; break                 // )
+        case 0x5B: square++; break                // [
+        case 0x5D: square--; break                // ]
+        case 0x7B: curly++; break                 // {
+        case 0x7D: curly--; break                 // }
+      }
+      if (c === 0x2f) { // /
+        let j = i - 1
+        let p
+        // find first non-whitespace prev char
+        for (; j >= 0; j--) {
+          p = exp.charAt(j)
+          if (p !== ' ') break
+        }
+        if (!p || !validDivisionCharRE.test(p)) {
+          inRegex = true
+        }
+      }
+    }
+  }
+
+  if (expression === undefined) {
+    expression = exp.slice(0, i).trim()
+  } else if (lastFilterIndex !== 0) {
+    pushFilter()
+  }
+
+  function pushFilter () {
+    (filters || (filters = [])).push(exp.slice(lastFilterIndex, i).trim())
+    lastFilterIndex = i + 1
+  }
+
+  if (filters) {
+    for (i = 0; i < filters.length; i++) {
+      expression = wrapFilter(expression, filters[i])
+    }
+  }
+
+  return expression
+}
+```
+
+`parseFilters` 函数在开头定义了一些变量
+
+#### 变量
+
+```js
+ let inSingle = false
+  let inDouble = false
+  let inTemplateString = false
+  let inRegex = false
+```
+
+作用：
+
+- `inSingle` 变量的作用是用来标识当前读取的字符是否在由**单引号**包裹的字符串中
+- `inDouble` 变量是用来标识当前读取的字符是否在由 **双引号** 包裹的字符串中
+- `inTemplateString` 变量是用来标识当前读取的字符是否在 **模板字符串** 中。
+- `inRegex` 变量是用来标识当前读取的字符是否在 **正则表达式** 中。
+
+
+
+```js
+ let curly = 0
+  let square = 0
+  let paren = 0
+```
+
+作用：
+
+-  `curly` 变量 --记录花括号数量
+
+  在解析绑定的属性值时，每遇到一个左花括号(`{`)，则 `curly` 变量的值就会加一，每遇到一个右花括号(`}`)，则 `curly` 变量的值就会减一。
+
+- `square` 变量--记录方括号数量
+
+  在解析绑定的属性值时，每遇到一个左方括号(`[`)，则 `square` 变量的值就会加一，每遇到一个右方括号(`]`)，则 `square` 变量的值就会减一。
+
+- `paren` 变量 -- 记录圆括号数量
+
+  在解析绑定的属性值时，每遇到一个左圆括号(`(`)，则 `paren` 变量的值就会加一，每遇到一个右圆括号(`)`)，则 `paren` 变量的值就会减一
+
+```js
+let lastFilterIndex = 0
+let c, prev, i, expression, filters
+```
+
+作用：
+
+- 变量`lastFilterIndex`  -- 用来确定过滤器的位置，值是属性值字符串中字符的索引
+- 变量 `c` -- 当前读入字符所对应的 `ASCII` 码
+- 变量 `prev`--当前字符的前一个字符所对应的 `ASCII` 码
+- 变量 `i`  -- 当前读入字符的位置索引
+- 变量 `expression`  --  `parseFilters` 函数的返回值
+- 变量 `filters` -- 数组，保存着所有过滤器函数名
+
+
+
+接下是`parseFilters`函数的核心代码`for`循环，首先看一下简化后的代码
+
+```js
+for (i = 0; i < exp.length; i++) {
+  prev = c
+  c = exp.charCodeAt(i)
+  if (inSingle) {
+    // 如果当前读取的字符存在于由单引号包裹的字符串内，则会执行这里的代码
+  } else if (inDouble) {
+    // 如果当前读取的字符存在于由双引号包裹的字符串内，则会执行这里的代码
+  } else if (inTemplateString) {
+    // 如果当前读取的字符存在于模板字符串内，则会执行这里的代码
+  } else if (inRegex) {
+    // 如果当前读取的字符存在于正则表达式内，则会执行这里的代码
+  } else if (
+    c === 0x7C && // pipe
+    exp.charCodeAt(i + 1) !== 0x7C &&
+    exp.charCodeAt(i - 1) !== 0x7C &&
+    !curly && !square && !paren
+  ) {
+    // 如果当前读取的字符是过滤器的分界线，则会执行这里的代码
+  } else {
+    // 当不满足以上条件时，执行这里的代码
+  }
+}
+```
+
+可以看到每次循环的开始，都会将上一次读取的字符所对应的 `ASCII` 码赋值给 `prev` 变量，然后再将变量 `c` 的值设置为当前读取字符所对应的 `ASCII` 码。
+
+接下来就是一大段`if...elseif...else` 语句
+
+先看第一个判断语句 -- 判断当前读入的字符存在于由单引号包裹的字符串内
+
+```js
+if (inSingle) {
+      if (c === 0x27 && prev !== 0x5C) inSingle = false
+} 
+```
+
+在`ASCII`中`0x27`代表字符'`,而`0x5C`代表`\`,目的是为了判断该字符是一个不带转译的单引号，如果判断成立，将 `inSingle` 变量的值设置为 `false`，代表接下来的解析工作已经不处于由单引号所包裹的字符串环境中了。
+
+第二个判断语句 -- 判断当前读入的字符存在于由双引号包裹的字符串内
+
+```js
+else if (inDouble) {
+    if (c === 0x22 && prev !== 0x5C) inDouble = false
+} 
+```
+
+同理`0x22`代表字符`"`,如果判断成立，将 `inDouble` 变量的值设置为 `false`，代表接下来的解析工作已经不处于由双引号所包裹的字符串环境中了
+
+第三个判断语句  -- 判断当前读入的字符存在于由模板字符串所包裹的字符串内
+
+```js
+ else if (inTemplateString) {
+      if (c === 0x60 && prev !== 0x5C) inTemplateString = false
+} 
+```
+
+同理`0x60`代表字符 ``` `,如果判断成立，将 `inTemplateString` 变量的值设置为 `false`，代表接下来的解析工作已经不处于模板字符串环境中了
+
+第四个判断语句 -- 判断当前读入的字符存在于由模板字符串所包裹的字符串内
+
+```js
+else if (inRegex) {
+      if (c === 0x2f && prev !== 0x5C) inRegex = false
+}
+```
+
+同理`0x2f`代表字符 `/ `,如果判断成立，将 `inRegex` 变量的值设置为 `false`，代表接下来的解析工作已经不处于正则表达式的环境中了
+
+第五个判断
+
+```js
+else if (
+      c === 0x7C && // pipe
+      exp.charCodeAt(i + 1) !== 0x7C &&
+      exp.charCodeAt(i - 1) !== 0x7C &&
+      !curly && !square && !paren
+    ) {
+      if (expression === undefined) {
+        // first filter, end of expression
+        lastFilterIndex = i + 1
+        expression = exp.slice(0, i).trim()
+      } else {
+        pushFilter()
+      }
+    }
+```
+
+`0x7C`daibiao 管道符`|`,实际上这个判断条件是用来检测当前遇到的管道符是否是过滤器的分界线。
+
+如果一个管道符是过滤器的分界线则必须满足以上条件，即：
+
+- 1、当前字符所对应的 `ASCII` 码必须是 `0x7C`，即当前字符必须是管道符。
+- 2、该字符的后一个字符不能是管道符。
+- 3、该字符的前一个字符不能是管道符。
+- 4、该字符不能处于花括号、方括号、圆括号之内
+
+这里先跳过，因为还没初始化
+
+当所有判断分支无效后，会进入最后一个分支
+
+```js
+ else {
+      switch (c) {
+        case 0x22: inDouble = true; break         // "
+        case 0x27: inSingle = true; break         // '
+        case 0x60: inTemplateString = true; break // `
+        case 0x28: paren++; break                 // (
+        case 0x29: paren--; break                 // )
+        case 0x5B: square++; break                // [
+        case 0x5D: square--; break                // ]
+        case 0x7B: curly++; break                 // {
+        case 0x7D: curly--; break                 // }
+      }
+      if (c === 0x2f) { // /
+        let j = i - 1
+        let p
+        // find first non-whitespace prev char
+        for (; j >= 0; j--) {
+          p = exp.charAt(j)
+          if (p !== ' ') break
+        }
+        if (!p || !validDivisionCharRE.test(p)) {
+          inRegex = true
+        }
+      }
+    }
+```
+
+这段 `switch` 语句的作用总结如下：
+
+- 如果当前字符为双引号(`"`)，则将 `inDouble` 变量的值设置为 `true`。
+- 如果当前字符为单引号(`‘`)，则将 `inSingle` 变量的值设置为 `true`。
+- 如果当前字符为模板字符串的定义字符(```)，则将 `inTemplateString` 变量的值设置为 `true`。
+- 如果当前字符是左圆括号(`(`)，则将 `paren` 变量的值加一。
+- 如果当前字符是右圆括号(`)`)，则将 `paren` 变量的值减一。
+- 如果当前字符是左方括号(`[`)，则将 `square` 变量的值加一。
+- 如果当前字符是右方括号(`]`)，则将 `square` 变量的值减一。
+- 如果当前字符是左花括号(`{`)，则将 `curly` 变量的值加一。
+- 如果当前字符是右花括号(`}`)，则将 `curly` 变量的值减一。
+
+假如
+
+```html
+<div :key="'id'"></div>
+```
+
+那么要解析的是字符串 `'id'`
+
+该字符串的第一个字符为单引号,由于一开始所有的初始值均为`false`,因此`switch` 语句将被执行，并且 `inSingle` 变量的值将被设置为 `true`。接着会解析第二个字符 `i`，由于此时 `inSingle` 变量的值已经为真，所以如下代码将被执行：
+
+```js
+if (inSingle) {
+  if (c === 0x27 && prev !== 0x5C) inSingle = false
+}
+```
+
+很显然字符 `i` 所对应的 `ASCII` 码不等于 `0x27`，直接下一个字符`d`，它的情况与字符 `i` 一样，也会被跳过。直到遇到最后一个字符 `'`，该字符同样是单引号，所以此时会将 `inSingle` 变量的值设置为 `false`，意味着由单引号包裹的字符串结束了。
+
+嗯。。。相当于什么都没有干，那这写判断目的就是为了避免误把存在于字符串中的管道符当做过滤器的分界线，例如：
+
+```html
+<div :key="'id|featId'"></div>
+```
+
+可看到绑定属性 `key` 的属性值为 `'id|featId'`，由于管道符 `|` 存在于由单引号所包裹的字符串内，所以该管道符不会被作为过滤器的分界线
+
+同样的道理，对于存在于由双引号包裹的字符串中或模板字符串中或正则表达式中的管道符，也不会被作为过滤器的分界线。
+
+那么现在处理需要过滤器的分支
+
+```js
+else if (
+  c === 0x7C && // pipe
+  exp.charCodeAt(i + 1) !== 0x7C &&
+  exp.charCodeAt(i - 1) !== 0x7C &&
+  !curly && !square && !paren
+) {
+  if (expression === undefined) {
+    // first filter, end of expression
+    lastFilterIndex = i + 1
+    expression = exp.slice(0, i).trim()
+  } else {
+    pushFilter()
+  }
+}
+```
+
+一开始的时候`expression`为`undefined`,所以当程序在解析字符串时第一次遇到作为过滤器分界线的管道符时，将会执行如下：
+
+```js
+if (expression === undefined) {
+  // first filter, end of expression
+  lastFilterIndex = i + 1  
+   expression = exp.slice(0, i).trim()} else {
+  // 省略...
+}
+```
+
+变量`lastFilterIndex`记录管道符下一个字符的位置索引，接着对字符串 `exp` 进行截取，其截取的位置恰好是索引为 `i` 的字符，也就是管道符，当然了截取后生成的新字符串是不包含管道符的，同时对截取后生成的新字符串使用 `trim` 方法去除前后空格，最后将处理后的结果赋值给 `expression` 表达式。
+
+例如：
+
+```html
+<div :key="id | featId"></div>
+```
+
+字符串为`id | featId`，管道符索引为3，因此`lastFilterIndex`的值为4,`expression`的值为`id`.然后进入下一次循环，并又找到一个管道线，
+
+```js
+ if (expression === undefined) {
+      //省略...
+} else {
+        pushFilter()
+}
+```
+
+由于此时`expression`已经不为`underfined`，那么则进入分支执行`pushFilter`函数
+
+`pushFilter`源码
+
+```js
+ function pushFilter() {
+    (filters || (filters = [])).push(exp.slice(lastFilterIndex, i).trim())
+    lastFilterIndex = i + 1
+  }
+```
+
+判断有没有`filters`变量，如果没有就将其初始化为一个空数组。接着将过滤器名字推进`filters`数组中去，更新`lastFilterIndex`
+
+例子：
+
+```html
+<div :key="id | featId | featId2"></div>
+```
+
+经过`for`循环处理后结果如下
+
+```js
+expression = 'id'
+filters = ['featId']
+```
+
+但这很明显不对，上述例子中过滤器有两个，现在`filters`只有一个数组，如果想让`filters`数组数据完全正确的话，那就要用以下代码了
+
+```js
+ if (expression === undefined) {
+    expression = exp.slice(0, i).trim()
+  } else if (lastFilterIndex !== 0) {
+    pushFilter()
+  }
+```
+
+当解析结束时变量 `i` 的值就应该是字符串的长度。此时 `for` 循环也将结束，此时代码依然会执行 `elseif` 分支，再次调用 `pushFilter` 函数，这时就会把`featId2`也推到`filters`数组中去
+
+接下来继续往后看，代码也到最关键的一步了
+
+```js
+if (filters) {
+    for (i = 0; i < filters.length; i++) {
+      expression = wrapFilter(expression, filters[i])
+    }
+  }
+```
+
+如果存在过滤器，那么就使用 `for` 循环对 `filters` 数组进行了遍历，在循环内部调用了 `wrapFilter` 函数
+
+`wrapFilter`函数
+
+```js
+function wrapFilter(exp: string, filter: string): string {
+  const i = filter.indexOf('(')
+  if (i < 0) {
+    return `_f("${filter}")(${exp})`
+  } else {
+    const name = filter.slice(0, i)
+    const args = filter.slice(i + 1)
+    return `_f("${name}")(${exp}${args !== ')' ? ',' + args : args}`
+  }
+}
+```
+
+依旧用上面的例子
+
+```js
+expression = 'id'
+filters = ['featId','featId2']
+```
+
+第一次遍历,将`featId`传入到`wrapFilter`函数中，由于`featId`并非为函数，因此返回的`expression`如下
+
+```js
+expression ='_f("featId")(id)'
+```
+
+第二次循环同理，返回的`expression`如下
+
+```js
+expression ='_f("featId2")(_f("featId")(id))'
+```
+
+
+
+到此`parseFilters`函数就分析完毕了
+
+```html
+<div :key="id"></div>
+```
+
+`parseFilters`函数返回`id`
+
+
+
+```html
+<div :key="id | featId | featId2"></div>
+```
+
+`parseFilters`函数返回`_f("featId2")(_f("featId")(id))`
+
+实际上 `_f` 函数来自于 `src/core/instance/render-helpers/resolve-filter.js` 文件，这个函数的作用就是接收一个过滤器的名字作为参数，然后找到相应的过滤器函数。当找到相应的过滤器函数之后会将表达式的值作为参数传递给该过滤器函数，同时该过滤器会返回经过处理之后的值，这个处理之后的值将作为下一个过滤器函数的参数。
+
+再回到 `getBindingAttr` 函数
+
+```js
+export function getBindingAttr (
+  el: ASTElement,
+  name: string,
+  getStatic?: boolean
+): ?string {
+  const dynamicValue =
+    getAndRemoveAttr(el, ':' + name) ||
+    getAndRemoveAttr(el, 'v-bind:' + name)
+  if (dynamicValue != null) {
+    return parseFilters(dynamicValue)  
+  } else if (getStatic !== false) {
+    const staticValue = getAndRemoveAttr(el, name)
+    if (staticValue != null) {
+      return JSON.stringify(staticValue)
+    }
+  }
+}
+```
+
+`getBindingAttr` 函数会先获取绑定属性的属性值，如果获取成功，则会使用 `parseFilters` 函数解析该属性值，并将 `parseFilters` 函数处理后的结果作为整个函数的返回值。
+
+再回到 `processKey` 函数
+
+```js
+function processKey(el) {
+  const exp = getBindingAttr(el, 'key')
+  if (exp) {
+    if (process.env.NODE_ENV !== 'production') {
+      if (el.tag === 'template') {
+        warn(
+          `<template> cannot be keyed. Place the key on real elements instead.`,
+          getRawBindingAttr(el, 'key')
+        )
+      }
+      if (el.for) {
+        const iterator = el.iterator2 || el.iterator1
+        const parent = el.parent
+        if (iterator && iterator === exp && parent && parent.tag === 'transition-group') {
+          warn(
+            `Do not use v-for index as key on <transition-group> children, ` +
+            `this is the same as not using keys.`,
+            getRawBindingAttr(el, 'key'),
+            true /* tip */
+          )
+        }
+      }
+    }
+    el.key = exp
+  }
+}
+```
+
+总结：
+
+- 例子一：
+
+```html
+<div key="id"></div>
+```
+
+上例中 `div` 标签的属性 `key` 是非绑定属性，所以会将它的值作为普通字符串处理，这时 `el.key` 属性的值为：
+
+```js
+el.key = JSON.stringify('id')
+```
+
+- 例子二：
+
+```html
+<div :key="id"></div>
+```
+
+上例中 `div` 标签的属性 `key` 是绑定属性，所以会将它的值作为表达式处理，而非普通字符串，这时 `el.key` 属性的值为：
+
+```js
+el.key = 'id'
+```
+
+- 例子三：
+
+```html
+<div :key="id | featId"></div>
+```
+
+上例中 `div` 标签的属性 `key` 是绑定属性，并且应用了过滤器，所以会将它的值与过滤器整合在一起产生一个新的表达式，这时 `el.key` 属性的值为：
+
+```js
+el.key = '_f("featId")(id)'
+```
+
+以上就是 `el.key` 属性的所有可能值。
+
+
+
+## 处理使用了ref属性的元素
+
+`processRef`源码
+
+```js
+function processRef(el) {
+  const ref = getBindingAttr(el, 'ref')
+  if (ref) {
+    el.ref = ref
+    el.refInFor = checkInFor(el)
+  }
+}
+```
+
+非常简单，获取`ref`的参数，如果有那么做两个标识
+
+`checkInFor`函数 判断当前元素是否在`for`循环内部
+
+```js
+function checkInFor (el: ASTElement): boolean {
+  let parent = el
+  while (parent) {
+    if (parent.for !== undefined) {
+      return true
+    }
+    parent = parent.parent
+  }
+  return false
+}
+```
+
+由以上分析可知，如果一个标签使用了 `ref` 属性，则：
+
+- 1、该标签的元素描述对象会被添加 `el.ref` 属性，该属性为解析后生成的表达式字符串，与 `el.key` 类似。
+- 2、该标签的元素描述对象会被添加 `el.refInFor` 属性，它是一个布尔值，用来标识当前元素的 `ref` 属性是否在 `v-for` 指令之内使用。
+
+## 处理(作用域)插槽
+
+插槽相关的形式：
+
+- 默认插槽：
+
+```html
+<slot></slot>
+```
+
+- 具名插槽
+
+```html
+<slot name="header"></slot>
+```
+
+- 插槽内容
+
+```html
+<h1 slot="header">title</h1>
+```
+
+- 作用域插槽 - slot-scope
+
+```html
+<h1 slot="header" slot-scope="slotProps">{{slotProps}}</h1>
+```
+
+- 作用域插槽 - scope
+
+```html
+<template slot="header" scope="slotProps">
+  <h1>{{slotProps}}</h1>
+</template>
+```
+
+`scope` 只能使用在 `template` 标签上，并且在 `2.5.0+` 版本中已经被 `slot-scope` 特性替代。
+
+针对不同的使用方式有不同的处理方式
+
+### 用`slot`标签的
+
+```js
+function processSlotOutlet(el) {
+  if (el.tag === 'slot') {
+    el.slotName = getBindingAttr(el, 'name')
+      //警告
+    if (process.env.NODE_ENV !== 'production' && el.key) {
+      warn(
+        `\`key\` does not work on <slot> because slots are abstract outlets ` +
+        `and can possibly expand into multiple elements. ` +
+        `Use the key on a wrapping element instead.`,
+        getRawBindingAttr(el, 'key')
+      )
+    }
+  }
+}
+```
+
+
+
+### 用slot-scope特性的
+
+```js
+function processSlotContent(el) {
+  let slotScope
+  if (el.tag === 'template') {
+    slotScope = getAndRemoveAttr(el, 'scope')
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== 'production' && slotScope) {
+      warn(
+        `the "scope" attribute for scoped slots have been deprecated and ` +
+        `replaced by "slot-scope" since 2.5. The new "slot-scope" attribute ` +
+        `can also be used on plain elements in addition to <template> to ` +
+        `denote scoped slots.`,
+        el.rawAttrsMap['scope'],
+        true
+      )
+    }
+    el.slotScope = slotScope || getAndRemoveAttr(el, 'slot-scope')
+  } else if ((slotScope = getAndRemoveAttr(el, 'slot-scope'))) {
+    /* istanbul ignore if */
+    if (process.env.NODE_ENV !== 'production' && el.attrsMap['v-for']) {
+      warn(
+        `Ambiguous combined usage of slot-scope and v-for on <${el.tag}> ` +
+        `(v-for takes higher priority). Use a wrapper <template> for the ` +
+        `scoped slot to make it clearer.`,
+        el.rawAttrsMap['slot-scope'],
+        true
+      )
+    }
+    el.slotScope = slotScope
+  }
+
+  // slot="xxx"
+  const slotTarget = getBindingAttr(el, 'slot')
+  if (slotTarget) {
+    el.slotTarget = slotTarget === '""' ? '"default"' : slotTarget
+    el.slotTargetDynamic = !!(el.attrsMap[':slot'] || el.attrsMap['v-bind:slot'])
+    // preserve slot as an attribute for native shadow DOM compat
+    // only for non-scoped slots.
+    if (el.tag !== 'template' && !el.slotScope) {
+      addAttr(el, 'slot', slotTarget, getRawBindingAttr(el, 'slot'))
+    }
+  }
+
+  // 2.6 v-slot syntax
+  if (process.env.NEW_SLOT_SYNTAX) {
+    if (el.tag === 'template') {
+      // v-slot on <template>
+      const slotBinding = getAndRemoveAttrByRegex(el, slotRE)
+      if (slotBinding) {
+        if (process.env.NODE_ENV !== 'production') {
+          if (el.slotTarget || el.slotScope) {
+            warn(
+              `Unexpected mixed usage of different slot syntaxes.`,
+              el
+            )
+          }
+          if (el.parent && !maybeComponent(el.parent)) {
+            warn(
+              `<template v-slot> can only appear at the root level inside ` +
+              `the receiving component`,
+              el
+            )
+          }
+        }
+        const { name, dynamic } = getSlotName(slotBinding)
+        el.slotTarget = name
+        el.slotTargetDynamic = dynamic
+        el.slotScope = slotBinding.value || emptySlotScopeToken // force it into a scoped slot for perf
+      }
+    } else {
+      // v-slot on component, denotes default slot
+      const slotBinding = getAndRemoveAttrByRegex(el, slotRE)
+      if (slotBinding) {
+        if (process.env.NODE_ENV !== 'production') {
+          if (!maybeComponent(el)) {
+            warn(
+              `v-slot can only be used on components or <template>.`,
+              slotBinding
+            )
+          }
+          if (el.slotScope || el.slotTarget) {
+            warn(
+              `Unexpected mixed usage of different slot syntaxes.`,
+              el
+            )
+          }
+          if (el.scopedSlots) {
+            warn(
+              `To avoid scope ambiguity, the default slot should also use ` +
+              `<template> syntax when there are other named slots.`,
+              slotBinding
+            )
+          }
+        }
+        // add the component's children to its default slot
+        const slots = el.scopedSlots || (el.scopedSlots = {})
+        const { name, dynamic } = getSlotName(slotBinding)
+        const slotContainer = slots[name] = createASTElement('template', [], el)
+        slotContainer.slotTarget = name
+        slotContainer.slotTargetDynamic = dynamic
+        slotContainer.children = el.children.filter((c: any) => {
+          if (!c.slotScope) {
+            c.parent = slotContainer
+            return true
+          }
+        })
+        slotContainer.slotScope = slotBinding.value || emptySlotScopeToken
+        // remove children as they are returned from scopedSlots now
+        el.children = []
+        // mark el non-plain so data gets generated
+        el.plain = false
+      }
+    }
+  }
+}
+```
+
+
+
+总结：
+
+- 1、对于 `<slot>` 标签，会为其元素描述对象添加 `el.slotName` 属性，属性值为该标签 `name` 属性的值，并且 `name` 属性可以是绑定的。
+- 2、对于 `<template>` 标签，会优先获取并使用该标签 `scope` 属性的值，如果获取不到则会获取 `slot-scope` 属性的值，并将获取到的值赋值给元素描述对象的 `el.slotScope` 属性，注意 `scope` 属性和 `slot-scope` 属性不能是绑定的。
+- 3、对于其他标签，会尝试获取 `slot-scope` 属性的值，并将获取到的值赋值给元素描述对象的 `el.slotScope` 属性。
+- 4、对于非 `<slot>` 标签，会尝试获取该标签的 `slot` 属性，并将获取到的值赋值给元素描述对象的 `el.slotTarget` 属性。如果一个标签使用了 `slot` 属性但却没有给定相应的值，则该标签元素描述对象的 `el.slotTarget` 属性值为字符串 `'"default"'`。
+
+
+
+## 处理使用了is或inline-template属性的元素
+
+```js
+function processComponent(el) {
+  let binding
+  if ((binding = getBindingAttr(el, 'is'))) {
+    el.component = binding
+  }
+  if (getAndRemoveAttr(el, 'inline-template') != null) {
+    el.inlineTemplate = true
+  }
+}
+```
+
+没什么好说的
+

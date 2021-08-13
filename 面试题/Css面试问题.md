@@ -123,7 +123,7 @@ inline-block -- 行内块级元素
 
 
 
-# src和href的区别
+## src和href的区别
 
 **href**标识超文本引用，用在**link**和**a**等元素上，**href**是引用和页面关联，是在当前元素和引用资源之间建立联系
 
@@ -131,7 +131,7 @@ inline-block -- 行内块级元素
 
 
 
-# 常见的浏览器内核和前缀有哪些？微信的浏览器内核是什么
+## 常见的浏览器内核和前缀有哪些？微信的浏览器内核是什么
 
 **谷歌**--以前是Webkit内核，现在是Blink内核。
 
@@ -157,7 +157,7 @@ Presto内核      -o-
 
 
 
-# 语义化标签、作用
+## 语义化标签、作用
 
 语义化标签--简单明了地知道该标签的作用
 
@@ -168,7 +168,7 @@ Presto内核      -o-
 3. 易于用户阅读，样式丢失的时候能让页面呈现清晰的结构。
 4. 兼容性更好，支持更多的网络设备
 
-# Css3动画有哪些
+## Css3动画有哪些
 
 1. transition 实现渐变动画
 
@@ -208,7 +208,7 @@ Presto内核      -o-
 
    
 
-# CSS预处理器
+## CSS预处理器
 
 sass、less、stylus
 
@@ -280,7 +280,7 @@ sass、less、stylus
 
 
 
-# CSS优化、提高性能的方法有哪些？
+## CSS优化、提高性能的方法有哪些？
 
 - 合并css文件，减少css文件数量
 - 减少嵌套，最好不要大于三层
@@ -295,7 +295,7 @@ sass、less、stylus
 - css压缩
 - GZIP压缩
 
-# 让Chrome支持小于12px的文字
+## 让Chrome支持小于12px的文字
 
 针对chrome浏览器,加webkit前缀，用transform:scale()这个属性进行放缩.
 
@@ -307,7 +307,7 @@ span{
 }
 ```
 
-# CSS3有哪些新特性
+## CSS3有哪些新特性
 
 新增选择器 p:nth-child（n）{color: rgba（255, 0, 0, 0.75）}
 
@@ -349,7 +349,7 @@ span{
 
 动画 @keyframes anim-1 {50% {border-radius: 50%;}} animation: anim-1 1s;
 
-# ::before和:after中双冒号和单冒号有什么区别
+## ::before和:after中双冒号和单冒号有什么区别
 
 单冒号(:)用于CSS3伪类，双冒号(::)用于CSS3伪元素。
 
@@ -359,13 +359,13 @@ span{
 
 
 
-# 响应式布局
+## 响应式布局
 
 响应式布局（Responsive design），意在实现不同屏幕分辨率的终端上浏览网页的不同展示方式。
 
-## 步骤
+### 步骤
 
-## 1. 设置 Meta 标签
+#### 1. 设置 Meta 标签
 
 ```
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
