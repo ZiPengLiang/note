@@ -1,3 +1,5 @@
+# Css篇
+
 ## 	了解盒模型吗
 
 CSS盒模型本质上是一个盒子，封装周围的HTML元素，它包括：`外边距（margin）`、`边框（border）`、`内边距（padding）`、`实际内容（content）`四个属性。 CSS盒模型：**标准模型 + IE模型**
@@ -156,6 +158,45 @@ Trident内核     -ms-
 Presto内核      -o-
 
 
+
+## html5有哪些新特性、移除了那些元素？如何处理HTML5新标签的浏览器兼容问题？如何区分HTML和HTML5？ 
+
+### 新特性
+
+- 拖拽释放(Drag and drop) API 
+- 语义化更好的内容标签（header,nav,footer,aside,article,section）
+- 音频、视频API(audio,video)
+- 画布(Canvas) API
+- 地理(Geolocation) API
+- 本地离线存储 localStorage 长期存储数据，浏览器关闭后数据不丢失；
+- sessionStorage 的数据在浏览器关闭后自动删除
+- 表单控件，calendar、date、time、email、url、search 
+- 新的技术webworker, websocket, Geolocation
+
+### 移除元素
+
+纯表现的元素：basefont，big，center，font, s，strike，tt，u；
+
+对可用性产生负面影响的元素：frame，frameset，noframes；
+
+### 如何处理
+
+支持HTML5新标签：
+IE8/IE7/IE6支持通过document.createElement方法产生的标签，
+可以利用这一特性让这些浏览器支持HTML5新标签，
+浏览器支持新标签后，还需要添加标签默认的样式；
+
+当然最好的方式是直接使用成熟的框架、使用最多的是html5shim框架
+
+```html
+   <!--[if lt IE 9]> 
+   <script> src="http://html5shim.googlecode.com/svn/trunk/html5.js"</script> 
+   <![endif]--> 
+```
+
+### 如何区分
+
+DOCTYPE声明\新增的结构元素\功能元素
 
 ## 语义化标签、作用
 
@@ -389,4 +430,206 @@ span{
 /** iPhone **/
 @media only screen and (min-width: 320px) and (max-width: 767px) {}
 ```
+
+
+
+## 各种兼容性的处理方法
+
+### **不同浏览器的标签默认的样式**
+
+```css
+*{ margin: 0; padding: 0; }
+```
+
+### **IE6 双倍边距的问题**
+
+设置 ie6 中设置浮动，同时又设置 margin，会出现双倍边距的问题
+
+```css
+display: inline;
+```
+
+### **解决 IE9 以下浏览器不能使用 opacity**
+
+```css
+opacity: 0.5;
+filter: alpha(opacity = 50);
+filter: progid:DXImageTransform.Microsoft.Alpha(style = 0, opacity = 50);
+```
+
+### **图片默认有间距**
+
+使用float属性为img布局
+
+###  **li之间有间距**
+
+解决方法：li 设置vertical-align:middle;
+
+
+
+## link和@import的区别
+
+1. link是XHTML标签，除了加载CSS外，还可以定义RSS等其他事务；@import属于CSS范畴，只能加载CSS。
+2. link引用CSS时，在页面载入时同时加载；@import需要页面网页完全载入以后加载。
+3. link是XHTML标签，无兼容问题；@import是在CSS2.1提出的，低版本的浏览器不支持。
+4. ink支持使用Javascript控制DOM去改变样式；而@import不支持。
+
+
+
+# JavaScript篇
+
+##  Ajax同步和异步怎么理解的
+
+### 区别：
+
+ajax异步请求：异步请求就当发出请求的同时，浏览器可以继续做任何事，Ajax发送请求并不会影响页面的加载与用户的操作，相当于是在两条线上，各走各的，互不影响。
+
+ajax同步请求：同步请求即是当前发出请求后，浏览器什么都不能做，必须得等到请求完成返回数据之后，才会执行后续的代码。
+
+### 同步与异步适用的场景
+
+看需要的请求的数据是否是程序继续执行必须依赖的数据
+
+
+
+## Js面相对象是怎么理解的 
+
+### 特性：
+
+- 封装性
+- 继承性
+- [多态性]抽象
+
+
+
+### 设计思想：
+
+- 抽象出 Class(构造函数)
+- 根据 Class(构造函数) 创建 Instance
+- 指挥 Instance 得结果
+
+
+
+### 创建对象：
+
+#### 简单方式
+
+直接通过 `new Object()` 创建：
+
+```js
+var person = new Object()
+person.name = 'Jack'
+person.age = 18
+
+person.sayName = function () {
+  console.log(this.name)
+}
+```
+
+缺点：代码太过冗余，复用性低
+
+#### 工厂函数
+
+```js
+function createPerson (name, age) {
+  return {
+    name: name,
+    age: age,
+    sayName: function () {
+      console.log(this.name)
+    }
+  }
+}
+```
+
+生成实例对象：
+
+```js
+var p1 = createPerson('Jack', 18)
+var p2 = createPerson('Mike', 18)
+```
+
+缺点：却没有解决对象识别的问题
+
+#### 构造函数
+
+```js
+function Person (name, age) {
+  this.name = name
+  this.age = age
+  this.sayName = function () {
+    console.log(this.name)
+  }
+}
+
+var p1 = new Person('Jack', 18)
+p1.sayName() // => Jack
+
+var p2 = new Person('Mike', 23)
+p2.sayName() // => Mike
+```
+
+缺点：耗内存
+
+优化： 原型 ,**把所有对象实例需要共享的属性和方法**直接定义在 `prototype` 对象上
+
+
+
+```js
+function Person (name, age) {
+  this.name = name
+  this.age = age
+}
+
+console.log(Person.prototype)
+
+Person.prototype.type = 'human'
+
+Person.prototype.sayName = function () {
+  console.log(this.name)
+}
+
+var p1 = new Person(...)
+var p2 = new Person(...)
+
+console.log(p1.sayName === p2.sayName) // => true
+
+```
+
+## apply和call的区别 
+
+### 定义：
+
+**重新定义函数的执行环境**，也就是`this`的指向
+
+### 语法：
+
+#### call()
+
+调用一个对象的方法，**用另一个对象替换当前对象**，可以继承另外一个对象的属性
+
+```js
+Function.call(obj[, param1[, param2[, [,...paramN]]]]);
+```
+
+- `obj`：这个对象将代替`Function`类里`this`对象
+- `params`：一串参数列表
+
+#### apply()
+
+```js
+Function.apply(obj[, argArray]);
+```
+
+- `obj`：这个对象将代替`Function`类里`this`对象
+- `argArray`：这个是数组，它将作为参数传给`Function`
+
+### 不同点
+
+**接收参数的方式不同**：
+
+- **apply()方法**接收两个参数，一个是函数运行的作用域（`this`），另一个是参数数组。
+- **call()方法**不一定接受两个参数，第一个参数也是函数运行的作用域（`this`），但是传递给函数的参数必须列举出来。
+
+
 
