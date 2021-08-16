@@ -160,7 +160,7 @@ export default {
 
 当从A到C的跨级通信时，prop传值会非常麻烦，会有很多冗余繁琐的转发操作；如果C中的状态改变还需要传递给A，使用事件还需要一级一级的向上传递，代码可读性就更差了。
 
-![](C:\Users\kx\Pictures\Screenshots\attrs.jpg)
+![](vue组件通信/attrs.jpg)
 
 
 

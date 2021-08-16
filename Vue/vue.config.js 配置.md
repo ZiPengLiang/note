@@ -2,7 +2,7 @@
 
 > **vue-cli3 脚手架搭建完成后，项目目录中没有 vue.config.js 文件，需要手动创建**
 
-![image-20200527164806424](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164806424.png)
+![image-20200527164806424](vue.config.js 配置/image-20200527164806424.png)
 
 
 
@@ -14,7 +14,7 @@ vue.config.js 是一个可选的配置文件，如果项目的 (和 package.json
 
 在根目录中创建 **vue.config.js**
 
-![image-20200527165215304](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527165215304.png)
+![image-20200527165215304](vue.config.js 配置/image-20200527165215304.png)
 
 
 
@@ -22,7 +22,7 @@ vue.config.js 是一个可选的配置文件，如果项目的 (和 package.json
 
 这个文件应该导出一个包含了选项的对象：
 
-![image-20200527170610550](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527170610550.png)
+![image-20200527170610550](vue.config.js 配置/image-20200527170610550.png)
 
 ### **配置选项**
 
@@ -36,7 +36,7 @@ vue.config.js 是一个可选的配置文件，如果项目的 (和 package.json
 >
 > 这个值也可以被设置为空字符串 ('') 或是相对路径 ('./')，这样所有的资源都会被链接为相对路径，这样打出来的包可以被部署在任意路径。
 
-![image-20200527170802288](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527170802288.png)
+![image-20200527170802288](vue.config.js 配置/image-20200527170802288.png)
 
 把开发服务器架设在根路径，可以使用一个条件式的值：
 
@@ -59,7 +59,7 @@ module.exports = {
 >
 > 输出文件目录，当运行 vue-cli-service build 时生成的生产环境构建文件的目录。注意目标目录在构建之前会被清除 (构建时传入 --no-clean 可关闭该行为)。
 
-![image-20200527171222480](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527171222480.png)
+![image-20200527171222480](vue.config.js 配置/image-20200527171222480.png)
 
 
 
@@ -71,7 +71,7 @@ module.exports = {
 >
 > 放置生成的静态资源 (js、css、img、fonts) 的目录。
 
-![image-20200527172555291](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527172555291.png)
+![image-20200527172555291](vue.config.js 配置/image-20200527172555291.png)
 
 **注：**从生成的资源覆写 filename 或 chunkFilename 时，assetsDir 会被忽略。
 
@@ -85,7 +85,7 @@ module.exports = {
 >
 > 指定生成的 index.html 的输出路径 (相对于 outputDir)。也可以是一个绝对路径。
 
-![image-20200527172607195](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527172607195.png)
+![image-20200527172607195](vue.config.js 配置/image-20200527172607195.png)
 
 
 
@@ -97,7 +97,7 @@ Default: true
 
 默认情况下，生成的静态资源在它们的文件名中包含了 hash 以便更好的控制缓存。然而，这也要求 index 的 HTML 是被 Vue CLI 自动生成的。如果你无法使用 Vue CLI 生成的 index HTML，你可以通过将这个选项设为 false 来关闭文件名哈希。
 
-![image-20200527172715959](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527172715959.png)
+![image-20200527172715959](vue.config.js 配置/image-20200527172715959.png)
 
 
 
@@ -111,7 +111,7 @@ Default: true
 
 其值应该是一个对象，对象的 key 是入口的名字，value 是：一个指定了 entry, template, filename, title 和 chunks 的对象 (除了 entry 之外都是可选的)，或一个指定其 entry 的字符串。
 
-![image-20200527172646321](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527172646321.png)
+![image-20200527172646321](vue.config.js 配置/image-20200527172646321.png)
 
 **注：**当在 多页应用 模式下构建时，webpack 配置会包含不一样的插件 (这时会存在多个 html-webpack-plugin 和 preload-webpack-plugin 的实例)。如果你试图修改这些插件的选项，请确认运行 vue inspect。
 
@@ -125,7 +125,9 @@ Default: true
 >
 > 是否在保存的时候使用 `eslint-loader` 进行检查。 有效的值：`ture` | `false` | `"error"` 当设置为 `"error"` 时，检查出的错误会触发编译失败。
 
-![image-20200527173136735](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527173136735.png)
+![image-20200527173136735](vue.config.js 配置/image-20200527173136735.png)
+
+
 
 
 
@@ -137,7 +139,7 @@ Default: true
 >
 > 是否使用包含运行时编译器的 Vue 构建版本。设置为 true 后你就可以在 Vue 组件中使用 template 选项了，但是这会让你的应用额外增加 10kb 左右。
 
-![image-20200527173147705](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527173147705.png)
+![image-20200527173147705](vue.config.js 配置/image-20200527173147705.png)
 
 
 
@@ -203,7 +205,7 @@ Default: true
 
 ### **Css相关配置**
 
-![css配置](E:\随手笔记\img\cssperizhi.webp)
+![css配置](vue.config.js 配置/cssperizhi.webp)
 
 
 
@@ -301,7 +303,7 @@ pwa
 >
 > 如果你的前端应用和后端 API 服务器没有运行在同一个主机上，你需要在开发环境下将 API 请求代理到 API 服务器。这个问题可以通过 vue.config.js 中的 devServer.proxy 选项来配置。
 
-![image-20200527175340086](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527175340086.png)
+![image-20200527175340086](vue.config.js 配置/image-20200527175340086.png)
 
 
 
@@ -374,4 +376,5 @@ module.exports = {
 
 
 
-原文链接：[vue.config.js 配置](https://www.jianshu.com/p/b358a91bdf2d) 
+原文链接：[vue.config.js 配置](https://www.jianshu.com/p/b358a91bdf2d) 
+

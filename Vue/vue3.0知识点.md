@@ -32,17 +32,17 @@ vue create hello-vue3
 
 开始
 
-![image-20201203111351386](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201203111351386.png)
+![image-20201203111351386](vue3.0知识点/image-20201203111351386.png)
 
 先择自选模板
 
-![image-20201203111457267](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201203111457267.png)
+![image-20201203111457267](vue3.0知识点/image-20201203111457267.png)
 
 由于vue3.0兼容了typescript,同时vue3.0已经用Typescript编写了，那么这么好的东西怎么能不用呢？
 
 选择vue3.0 的项目创建方式
 
-![image-20201203111651972](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201203111651972.png)
+![image-20201203111651972](vue3.0知识点/image-20201203111651972.png)
 
 嗯，这样就ok了，剩下的和vue2.0的步骤是一样的
 
@@ -50,7 +50,7 @@ vue create hello-vue3
 
 创建后的目录
 
-![image-20201203112856413](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201203112856413.png)
+![image-20201203112856413](vue3.0知识点/image-20201203112856413.png)
 
 接下来就是相关知识点了
 
@@ -322,7 +322,7 @@ export default {
 
 同样的一个子组件 GlobalHeader,但是一个使用了Teleport功能后，在不同的位置渲染出来了
 
-![image-20201203170722282](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201203170722282.png)
+![image-20201203170722282](vue3.0知识点/image-20201203170722282.png)
 
 Teleport 提供了一种干净的方法，允许我们控制在 DOM 中哪个父节点下呈现 HTML，而不必求助于全局状态或将其拆分为两个组件。
 

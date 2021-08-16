@@ -44,7 +44,7 @@ div{
 </body>
 ```
 
-![bfc_1](E:\随手笔记\img\bfc_1.png)
+![bfc_1](BFC/bfc_1.png)
 
 因为两个 div 元素都处于同一个 BFC 容器下 (这里指 body 元素) 所以第一个 div 的下边距和第二个 div 的上边距发生了重叠，所以两个盒子之间距离只有 100px，而不是 200px。
 
@@ -70,7 +70,7 @@ p {
 
 这时候，两个盒子边距就变成了 200px
 
-![bfc_3](E:\随手笔记\img\bfc_3.png)
+![bfc_3](BFC/bfc_3.png)
 
 ### **2. BFC 可以包含浮动的元素（清除浮动）**
 
@@ -96,11 +96,13 @@ p {
 
 由于容器内元素浮动，脱离了文档流，所以容器只剩下 2px 的边距高度。
 
-![image-20210308161026260](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20210308161026260.png)
+image-20210308161026260.png
+
+![image-20210308161026260](BFC/image-20210308161026260.png)
 
 如果使触发容器的 BFC，那么容器将会包裹着浮动元素。
 
-![image-20210308161210023](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20210308161210023.png)
+![image-20210308161210023](BFC/image-20210308161210023.png)
 
 ### **3. BFC 可以阻止元素被浮动元素覆盖**
 
@@ -112,11 +114,11 @@ p {
 也没有触发 BFC 元素, width: 200px; height:200px; background: #eee;</div>
 ```
 
-![image-20210308161324157](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20210308161324157.png)
+![image-20210308161324157](BFC/image-20210308161324157.png)
 
 这时候其实第二个元素有部分被浮动元素所覆盖，(但是文本信息不会被浮动元素所覆盖) 如果想避免元素被覆盖，可触第二个元素的 BFC 特性，在第二个元素中加入 **overflow: hidden**，就会变成：
 
-![image-20210308161521492](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20210308161521492.png)
+![image-20210308161521492](BFC/image-20210308161521492.png)
 
 
 

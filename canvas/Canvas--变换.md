@@ -29,7 +29,7 @@ Canvas状态存储在栈中，每当`save()`方法被调用后，当前的状态
 
 结果
 
-![image-20191217114935077](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191217114935077.png)
+![image-20191217114935077](Canvas--变换/image-20191217114935077.png)
 
 
 
@@ -59,7 +59,7 @@ for (var i = 0; i < 3; i++) {
 
 结果：
 
-![image-20191217115808087](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191217115808087.png)
+![image-20191217115808087](Canvas--变换/image-20191217115808087.png)
 
 
 

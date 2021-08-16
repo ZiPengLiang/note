@@ -20,7 +20,7 @@
 
 1.在新建的文件夹下创建项目 vue create my-project
 
-![image-20200527162513494](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527162513494.png)
+![image-20200527162513494](vue-cl3搭建项目/image-20200527162513494.png)
 
 指向的是ssr是因为上次配置过的cli3的配置，第一次执行create是没有的
 
@@ -28,7 +28,7 @@
 
 当然了需求不同，往往需要手动配置
 
-![image-20200527163003709](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527163003709.png)
+![image-20200527163003709](vue-cl3搭建项目/image-20200527163003709.png)
 
 
 
@@ -54,7 +54,7 @@ CSS Pre-processors 支持 CSS 预处理器。
 
  E2E Testing 支持 E2E 测试。
 
-![image-20200527163437407](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527163437407.png)
+![image-20200527163437407](vue-cl3搭建项目/image-20200527163437407.png)
 
 以上是我搭建Vue项目的配置信息
 
@@ -62,13 +62,13 @@ CSS Pre-processors 支持 CSS 预处理器。
 
 3.当选了Router后会询问是否采用history，当然基本都是用的
 
-![image-20200527163625559](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527163625559.png)
+![image-20200527163625559](vue-cl3搭建项目/image-20200527163625559.png)
 
 
 
 4.css的预处理
 
-![image-20200527163730822](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527163730822.png)
+![image-20200527163730822](vue-cl3搭建项目/image-20200527163730822.png)
 
 我选了Sass
 
@@ -76,7 +76,7 @@ CSS Pre-processors 支持 CSS 预处理器。
 
 5.我选择的是ESLint + Prettier
 
-![image-20200527163943737](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527163943737.png)
+![image-20200527163943737](vue-cl3搭建项目/image-20200527163943737.png)
 
 
 
@@ -85,28 +85,28 @@ CSS Pre-processors 支持 CSS 预处理器。
 我自己选择保存就检测
 第一个是保存检测，第二个是fix和commit的时候检测
 
-![image-20200527164041148](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164041148.png)
+![image-20200527164041148](vue-cl3搭建项目/image-20200527164041148.png)
 
 
 
 7.单元测试，我选择了Mocha
 
-![image-20200527164238990](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164238990.png)
+![image-20200527164238990](vue-cl3搭建项目/image-20200527164238990.png)
 
 
 
 8.配置文件存放地方
 第一个是独立文件夹位置，第二个是在package.json文件里
 
-![image-20200527164307971](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164307971.png)
+![image-20200527164307971](vue-cl3搭建项目/image-20200527164307971.png)
 
 9.询问是否记录这一次的配置，以便下次使用，如一开始的时候会显示的vuecli3配置
 
-![image-20200527164327651](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164327651.png)
+![image-20200527164327651](vue-cl3搭建项目/image-20200527164327651.png)
 
 10.回车确定等待下载
 
-![image-20200527164349916](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164349916.png)
+![image-20200527164349916](vue-cl3搭建项目/image-20200527164349916.png)
 
 
 
@@ -117,13 +117,13 @@ cd my-project
 npm run serve
 ```
 
-![image-20200527164556028](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164556028.png)
+![image-20200527164556028](vue-cl3搭建项目/image-20200527164556028.png)
 
 
 
 12.vue-cli3.0的目录结构相比2.0而言要简介许多，没有了build和config等文件，当需要其他配置的时候需要自己去配置，比如说webpack配置
 
-![image-20200527164806424](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20200527164806424.png)
+![image-20200527164806424](vue-cl3搭建项目/image-20200527164806424.png)
 
 
 

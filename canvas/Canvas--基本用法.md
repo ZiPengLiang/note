@@ -79,7 +79,7 @@ var ctx = canvas.getContext('2d');
 
 效果
 
-![image-20191205102754158](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205102754158.png)
+![image-20191205102754158](Canvas--基本用法/image-20191205102754158.png)
 
 到目前为止，上述所说的是canvas的基本创建和使用，接下来要说的是如何通过canvas绘制各种图案了
 
@@ -87,9 +87,9 @@ var ctx = canvas.getContext('2d');
 
 ### 栅格
 
- 在绘制图案之前，首先要了解画布的布局--栅格(canvas grid)以及坐标空间。canvas元素默认被网格所覆盖。通常来说网格中的一个单元相当于canvas元素中的一像素。栅格的起点为左上角（坐标为（0,0））。所有元素的位置都相对于原点定位。所以图中蓝色方形左上角的坐标为距离左边（X轴）x像素，距离上边（Y轴）y像素（坐标为（x,y））
+ 在绘制图案之前，首先要了解画布的布局--栅格(canvas grid)以及坐标空间。canvas元素默认被网格所覆盖。通常来说网格中的一个单元相当于canvas元素中的一像素。栅格的起点为左上角（坐标为（0,0））。所有元素的位置都相对于原点定位。所以图中蓝色方形左上角的坐标为距离左边（X轴）x像素，距离上边（Y轴）y像素（坐标为（x,y））
 
-<img src="C:\Users\kx\Pictures\Screenshots\canvasGrid.png" style="zoom:100%;" />
+![](Canvas--基本用法/canvasGrid.png)
 
 
 
@@ -128,7 +128,7 @@ width/height---设置矩形的尺寸。
 
 结果
 
-![image-20191205105817702](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205105817702.png)
+![image-20191205105817702](Canvas--基本用法/image-20191205105817702.png)
 
 ### 绘制路径
 
@@ -173,7 +173,7 @@ ctx.lineTo(100, 25);
 ctx.fill();
 ```
 
-![image-20191205110913845](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205110913845.png)
+![image-20191205110913845](Canvas--基本用法/image-20191205110913845.png)
 
 
 
@@ -203,7 +203,7 @@ moveTo(x,y) --将笔触移动到指定的坐标x以及y上
 
 实现效果：
 
-![image-20191205113552018](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205113552018.png)
+![image-20191205113552018](Canvas--基本用法/image-20191205113552018.png)
 
 
 
@@ -232,7 +232,7 @@ lineTo(x，y)---绘制一条从当前位置到指定x以及y位置的直线。
 
 结果
 
-![image-20191205114419428](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205114419428.png)
+![image-20191205114419428](Canvas--基本用法/image-20191205114419428.png)
 
 
 

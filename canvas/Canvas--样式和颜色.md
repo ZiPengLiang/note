@@ -25,7 +25,7 @@ var ctx = document.getElementById('canvas').getContext('2d');
 
 结果
 
-![image-20191205144159628](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205144159628.png)
+![image-20191205144159628](Canvas--样式和颜色/image-20191205144159628.png)
 
 
 
@@ -46,7 +46,7 @@ for (var i=0;i<6;i++){
 
 结果
 
-![image-20191205144500714](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205144500714.png)
+![image-20191205144500714](Canvas--样式和颜色/image-20191205144500714.png)
 
 
 
@@ -83,7 +83,7 @@ var ctx = document.getElementById('canvas').getContext('2d');
 
 结果：
 
-![image-20191205165320086](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205165320086.png)
+![image-20191205165320086](Canvas--样式和颜色/image-20191205165320086.png)
 
 2、lineCap = type ---设置线条末端样式。
 
@@ -116,7 +116,7 @@ var ctx = document.getElementById('canvas').getContext('2d');
   }
 ```
 
-![image-20191205170048699](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205170048699.png)
+![image-20191205170048699](Canvas--样式和颜色/image-20191205170048699.png)
 
 
 
@@ -142,7 +142,7 @@ var ctx = document.getElementById('canvas').getContext('2d');
   }
 ```
 
-![image-20191205170549863](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205170549863.png)
+![image-20191205170549863](Canvas--样式和颜色/image-20191205170549863.png)
 
 ​	最上面一条是 `round` 的效果，边角处被磨圆了，圆的半径等于线宽。中间和最下面一条分别是 bevel 和 miter 的效果。当值是 `miter `的时候，线段会在连接处外侧延伸直至交于一点，延伸效果受到下面将要介绍的 `miterLimit` 属性的制约。
 
@@ -188,7 +188,7 @@ ctx.fillStyle = gradient;
 ctx.fillRect(10,10,200,100);
 ```
 
-![image-20191205173935759](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205173935759.png)
+![image-20191205173935759](Canvas--样式和颜色/image-20191205173935759.png)
 
 
 
@@ -222,7 +222,7 @@ ctx.fillStyle = gradient;
 ctx.fillRect(0,0,200,200);
 ```
 
-![image-20191205174435657](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191205174435657.png)
+![image-20191205174435657](Canvas--样式和颜色/image-20191205174435657.png)
 
 
 
@@ -276,7 +276,7 @@ img.onload = function() {
 
 结果
 
-![image-20191206105632009](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206105632009.png)
+![image-20191206105632009](Canvas--样式和颜色/image-20191206105632009.png)
 
 
 
@@ -302,7 +302,7 @@ ctx.fillStyle = "green";
 ctx.fillRect(10, 10, 100, 100);
 ```
 
-![image-20191206111109269](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206111109269.png)
+![image-20191206111109269](Canvas--样式和颜色/image-20191206111109269.png)
 
 #### 2、**`shadowBlur`** 
 
@@ -326,7 +326,7 @@ ctx.fillRect(10, 10, 100, 100);
 
 结果：
 
-![image-20191206111942423](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206111942423.png)
+![image-20191206111942423](Canvas--样式和颜色/image-20191206111942423.png)
 
 #### 3、**`shadowColor`** 
 
@@ -353,7 +353,7 @@ ctx.fillRect(10, 10, 100, 100);
 
 结果：
 
-![image-20191206112722568](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206112722568.png)
+![image-20191206112722568](Canvas--样式和颜色/image-20191206112722568.png)
 
 
 

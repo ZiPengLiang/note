@@ -29,7 +29,7 @@ ctx.fillText("Hello world", 50, 100);
 
 结果
 
-![image-20191206115939424](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206115939424.png)
+![image-20191206115939424](Canvas--绘制文本/image-20191206115939424.png)
 
 
 
@@ -60,7 +60,7 @@ ctx.strokeText("Hello world", 50, 100);
 
 结果
 
-![image-20191206152700796](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206152700796.png)
+![image-20191206152700796](Canvas--绘制文本/image-20191206152700796.png)
 
 
 
@@ -106,7 +106,7 @@ ctx.textAlign = "left";
 ctx.strokeText("Hello world", 0, 100);
 ```
 
-![image-20191206154018306](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20191206154018306.png)
+![image-20191206154018306](Canvas--绘制文本/image-20191206154018306.png)
 
 
 

@@ -42,7 +42,7 @@
 
 ​	重点：`Promise.prototype.then` 和`Promise.prototype.catch` 返回的都是Promise对象，因此他们可以被链式调用
 
-![](C:\Users\kx\Pictures\Screenshots\promises.png)
+![](Promise/promises.png)
 
 
 

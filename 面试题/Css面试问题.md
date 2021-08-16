@@ -645,3 +645,638 @@ Function.apply(obj[, argArray]);
 - jsonp跨域
 - 代理服务器
 
+## 内存泄露情况
+
+### 垃圾回收机制
+
+原理：垃圾收集器会定期（周期性）找出那些不在继续使用的变量，然后释放其内存
+
+- 标记清除
+
+  垃圾回收程序运行的时候，会标记内存中存储的所有变量。然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉
+
+- 引用计数
+
+  语言引擎有一张"引用表"，保存了内存里面所有的资源（通常是各种值）的引用次数。次数是`0`，就表示这个值不再用到了
+
+### 内存泄露情况
+
+- 全局变量
+- 定时器
+- 闭包
+- 没有清理对`DOM`元素的引用 -- 事件监听
+
+
+
+## 一次完整的HTTP事务是怎样的一个过程
+
+### 简单分析
+
+从输入 `URL`到回车后发生的行为如下：
+
+- URL解析
+- DNS 查询
+- TCP 连接
+- HTTP 请求
+- 响应请求
+- 页面渲染
+
+### 详细分析
+
+#### URL解析
+
+判断你输入的是一个合法的`URL` 还是一个待搜索的关键词，并且根据你输入的内容进行对应操作
+
+####  DNS查询
+
+![img](Css面试问题/330fb770-bdf4-11eb-85f6-6fac77c0c9b3.png)
+
+获取到了域名对应的目标服务器`IP`地址
+
+#### TCP连接
+
+在确定目标服务器服务器的`IP`地址后，则经历三次握手建立`TCP`连接
+
+#### 发送 http 请求
+
+当建立`tcp`连接之后，就可以在这基础上进行通信，浏览器发送 `http` 请求到目标服务器
+
+请求的内容包括：
+
+- 请求行
+- 请求头
+- 请求主体
+
+#### 响应请求
+
+当服务器接收到浏览器的请求之后，就会进行逻辑操作，处理完成之后返回一个`HTTP`响应消息，包括：
+
+- 状态行
+- 响应头
+- 响应正文
+
+#### 页面渲染
+
+当浏览器接收到服务器响应的资源后，首先会对资源进行解析：
+
+- 查看响应头的信息，根据不同的指示做对应处理，比如重定向，存储cookie，解压gzip，缓存资源等等
+- 查看响应头的 Content-Type的值，根据不同的资源类型采用不同的解析方式
+
+关于页面的渲染过程如下：
+
+- 解析HTML，构建 DOM 树
+- 解析 CSS ，生成 CSS 规则树
+- 合并 DOM 树和 CSS 规则，生成 render 树
+- 布局 render 树（ Layout / reflow ），负责各元素尺寸、位置的计算
+- 绘制 render 树（ paint ），绘制页面像素信息
+- 浏览器会将各层的信息发送给 GPU，GPU 会将各层合成（ composite ），显示在屏幕上
+
+
+
+## 如何阻止事件冒泡和默认事件
+
+### **阻止事件冒泡**
+
+stopPropagation()
+
+```js
+md.onclick = function() {
+    alert("我是中间的盒子md");
+    event.stopPropagation();
+};
+```
+
+IE8一下，有一个cancelBubble属性
+
+```js
+var e = window.event || event;
+if(document.all) {
+    e.cancelBubble = true;
+}else {
+    e.stopPropagation();
+}
+```
+
+### **阻止默认事件**
+
+preventDefault()方法
+
+IE事件对象有一个属性returnValue，默认是true，当将其设置为false时，则可以取消事件默认行为
+
+```js
+function cancelHandler(event) {
+    var e = window.event || event;
+    if(document.all) {
+        e.returnValue = false;
+    }
+    else {
+        e.preventDefault();
+    }
+}
+
+```
+
+
+
+## 解释jsonp的原理，以及为什么不是真正的ajax
+
+### **原理**
+
+**动态创建script标签，回调函数**
+
+### **为什么不是ajax**
+
+ajax的核心是通过XmlHttpRequest获取非本页内容
+
+jsonp的核心则是动态添加<script>标签来调用服务器提供的js脚本
+
+
+
+## javascript实现继承的方式有哪些
+
+1. 原型链继承；将父类的实例作为子类的原型。
+2. 构造继承；使用父类的构造函数来增强子类实例。
+3. 实例继承；为父类实例添加新特性，作为子类实例返回。
+4. 拷贝继承。
+5. 组合继承。
+6. 寄生组合继承
+
+参照：[继承的多种方式以及优缺点](E:\随手笔记\前端基本知识点\深入专题\继承的多种方式和优缺点.md)
+
+
+
+## js创建对象的几种方式
+
+1. `{}`
+2. `new Ｏbject()`
+3. 使用字面量
+4. 工厂模式
+5. 构造函数模式（constructor）
+6. 原型模式（prototype）
+7. 构造函数+原型模式
+
+参照：[创建对象的多种方式以及优缺点](E:\随手笔记\前端基本知识点\深入专题\创建对象的多种方式以及优缺点.md)
+
+
+
+## jQuery的优势
+
+1. **轻量级；**
+
+    jQuery非常轻巧，采用`UglifyJS`压缩后，大小保持在30kb左右；
+
+2. **强大的选择器；**
+
+   允许开发者使用从CSS1到CSS3 几乎所有的选择器，以及jQuery独创的高级而复杂的选择器。
+
+3. **出色的DOM操作的封装；**
+
+4. **可靠的事件处理机制；**
+
+5. **完善的Ajax；**
+
+   jQuery将所有的Ajax操作封装到一个函数 $.ajax() 里,无需关心复杂的浏览器兼容性和XMLHttpRequest对象的创建和使用的问题；
+
+6. **不污染顶级变量**
+
+    jQuery只建立一个名为jQuery的对象，其所有的函数方法都在这个对象之下。其别名$也可以随时交出控制权，绝对不会污染其他的对象。
+
+7. **出色的浏览器兼容性；** 
+
+   jQuery能够在IE 6.0+、FF 3.6+、Safari 5.0+、Opera 和 Chrome等浏览器下正常运行
+
+8. **链式操作方式；** 
+
+9. **隐式迭代；**
+
+   jQuery里的方法都被设计成自动操作对象集合，而不是单独的对象，这使得大量的循环结构变得不再必要，从而大幅减少了代码量
+
+10. **行为层与结构层的分离；**
+
+11. **丰富的插件支持；**
+
+12. **完善的文档；**
+
+13. **开源；** 
+
+# 原理篇：
+
+## 怎么看待Web App 、hybrid App、Native App？
+
+### **app的分类**
+
+大致可以分为这3种：
+
+- native app（原生app）
+- web app
+- hybrid app（混合app）
+
+### **优缺点**
+
+#### **native app**
+
+ **优点：**
+
+- 提供最佳用户体验，最优质的用户界面，流畅的交互
+- 可以访问本地资源
+- 可以调用移动硬件设备，比如摄像头、麦克风等
+
+**缺点：**
+
+- 开发成本高。每种移动操作系统都需要独立的开发项目，针对不同平台提供不同体验；
+- 发布新版本慢。下载是用户控制的，很多用户不愿意下载更新（比如说，版本发布到了3.0，但还是有很多1.0的用户，你可能就得继续维护1.0版本的API）
+- 应用商店发布审核周期长。安卓平台大概要1~3天，而iOS平台需要的时间更长
+
+
+
+#### **web app**
+
+**优点：**
+
+- 不需要安装包，节约手机空间
+- 整体量级轻，开发成本低
+- 不需要用户进行手动更新，由应用开发者直接在后台更新，推送到用户面前的都是全新版本，更便于业务的开展
+- 基于浏览器，可以跨平台使用
+
+**缺点：**
+
+- 页面跳转费力，不稳定感更强。在网速受到限制时，很多时候出现卡顿或者卡死现象，交互效果受到限制
+- 安全性相对较低，数据容易泄露或者被劫持。
+
+
+
+#### **Hybrid app**
+
+集合了两种App各自的优势
+
+1. 在实现更多功能的前提下，使得App安装包不至于过大。
+2. 在应用内部打开Web网页，省去了跳转浏览器的麻烦。
+3. 主要功能区相对稳定下，增加的功能区采用Web形式，使得迭代更加方便。
+4. Web页面在用户设置不同的网络制式时会以不同的形式呈现。。
+
+
+
+## 模块化开发如何理解的
+
+其实就是封装细节，提供使用接口，彼此之间互不影响，每个模块都是实现某一特定的功能，同时也需要避免全局变量的污染，最初通过函数实现模块，实际上是利用了函数的局部作用域来形成模块。
+
+### 模块化规范
+
+#### CommonJS
+
+根据这个规范，每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类，都是私有的，对其他文件不可见。`CommonJS`规范规定，每个模块内部，`module`变量代表当前模块。这个变量是一个对象，它的`exports`属性是对外的接口。
+
+`CommonJS`规范通过`require`导入，`module.exports`与`exports`进行导出。
+
+
+
+#### AMD
+
+`CommonJS`规范引入模块是同步加载的，这对服务端不是问题，因为其模块都存储在硬盘上，可以等待同步加载完成，但在浏览器中模块是通过网络加载的，若是同步阻塞等待模块加载完成，则可能会出现浏览器页面假死的情况
+
+`AMD`采用异步方式加载模块，模块的加载不影响它后面语句的运行
+
+```js
+define(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
+    // do something
+    return {};
+});
+```
+
+#### CMD
+
+`CMD`通用模块定义，是`SeaJS`在推广过程中对模块定义的规范化产出，也是浏览器端的模块化异步解决方案
+
+
+
+## 对Vue的理解 
+
+Vue.js 是一套构建用户界面的渐进式框架。与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。
+
+渐进式 -- 阶梯式向前，vue是轻量级的，它有很多独立的功能或库，能根据不同的需求使用不同的功能
+
+渐进式表现：声明式渲染——组件系统——客户端路由——-大数据状态管理——-构建工具
+
+### 核心点:
+
+- 响应式数据绑定
+- 组合的视图组件
+
+
+
+## vue-router有哪几种导航钩子？
+
+### **全局导航钩子**
+
+- **router.beforeEach(to, from, next): 路由改变前的钩子**
+
+- **router.beforeResolve : 在导航被确认之前，同时在所有组件内守卫和异步路由组件被解析之后，该钩子函数就被调用**
+
+- **router.afterEach : 路由改变后的钩子**
+
+
+
+### **路由独享钩子**
+
+```js
+cont router = new Router({
+   routes: [
+       {
+           path: '/file',
+           component: File,
+           beforeEnter: (to, from ,next) => {
+               // do someting
+           }
+       }
+   ]
+});
+```
+
+### **组件内的导航钩子**
+
+**beforeRouteEnter 在进入当前组件对应的路由前调用** --不能获取组件实例 this
+
+**beforeRouteUpdate 在当前路由改变，但是该组件被复用时调用** -- 正常获取组件实例 this
+
+**beforeRouteLeave 在离开当前组件对应的路由前调用** -- 正常获取组件实例 this
+
+
+
+## 自定义指令， 它有哪些钩子函数?
+
+### 如何实现
+
+全局注册注册主要是用过`Vue.directive`方法进行注册
+
+`Vue.directive`第一个参数是指令的名字（不需要写上`v-`前缀），第二个参数可以是对象数据，也可以是一个指令函数
+
+```js
+// 注册一个全局自定义指令 `v-focus`
+Vue.directive('focus', {
+  // 当被绑定的元素插入到 DOM 中时……
+  inserted: function (el) {
+    // 聚焦元素
+    el.focus()  // 页面加载完成之后自动让输入框获取到焦点的小功能
+  }
+})
+```
+
+```js
+directives: {
+  focus: {
+    // 指令的定义
+    inserted: function (el) {
+      el.focus() // 页面加载完成之后自动让输入框获取到焦点的小功能
+    }
+  }
+}
+```
+
+### 钩子函数：
+
+- `bind`：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置
+- `inserted`：被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)
+- `update`：所在组件的 `VNode` 更新时调用，但是可能发生在其子 `VNode` 更新之前。指令的值可能发生了改变，也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新
+- `componentUpdated`：指令所在组件的 `VNode` 及其子 `VNode` 全部更新后调用
+- `unbind`：只调用一次，指令与元素解绑时调用
+
+#### 参数
+
+- `el`：指令所绑定的元素，可以用来直接操作 `DOM`
+- `binding`：一个对象，包含以下`property`：
+  - `name`：指令名，不包括 `v-` 前缀。
+  - `value`：指令的绑定值，例如：`v-my-directive="1 + 1"` 中，绑定值为 `2`。
+  - `oldValue`：指令绑定的前一个值，仅在 `update` 和 `componentUpdated` 钩子中可用。无论值是否改变都可用。
+  - `expression`：字符串形式的指令表达式。例如 `v-my-directive="1 + 1"` 中，表达式为 `"1 + 1"`。
+  - `arg`：传给指令的参数，可选。例如 `v-my-directive:foo` 中，参数为 `"foo"`。
+  - `modifiers`：一个包含修饰符的对象。例如：`v-my-directive.foo.bar` 中，修饰符对象为 `{ foo: true, bar: true }`
+- `vnode`：`Vue` 编译生成的虚拟节点
+- `oldVnode`：上一个虚拟节点，仅在 `update` 和 `componentUpdated` 钩子中可用
+
+## VueX
+
+定义：状态管理器，统一管理和维护各个vue组件的可变化状态
+
+五个核心概念，`state`, `getters`, `mutations`, `actions`, `modules`。
+
+- state 存放状态
+
+- mutations state成员操作
+
+  `mutations`是操作`state`数据的方法的集合，比如对该数据的修改、增加、删除等等。
+
+  ```js
+   state:{
+          name:'helloVueX'
+      },
+      mutations:{
+          //es6语法，等同edit:funcion(){...}
+          edit(state，payload){
+              state.name = payload
+          }
+      }
+  ```
+
+  使用：
+
+  ```js
+  this.$store.commit('edit',"666")
+  ```
+
+- getters 加工state成员给外界
+
+  Getters中的方法有两个默认参数
+
+  - state 当前VueX对象中的状态对象
+  - getters 当前getters对象，用于将getters下的其他getter拿来用
+
+  ```js
+  getters:{
+      nameInfo(state){
+          return "姓名:"+state.name
+      },
+      fullInfo(state,getters){
+          return getters.nameInfo+'年龄:'+state.age
+      }  
+  }
+  ```
+
+  ```js
+  this.$store.getters.fullInfo
+  ```
+
+- actions 异步操作
+
+  两个默认参数
+
+  - `context` 上下文(相当于箭头函数中的this)对象
+  - `payload` 挂载参数
+
+  ```js
+  actions:{
+      aEdit(context,payload){
+          setTimeout(()=>{
+              context.commit('edit',payload)
+          },2000)
+      }
+  }
+  ```
+
+  ```js
+  this.$store.dispatch('aEdit',{age:15})
+  ```
+
+- modules 模块化状态管理
+
+![img](Css面试问题/16550832-20d0ad3c60a99111.png)
+
+### **vuex的State特性是？**
+
+1. Vuex就是一个仓库，仓库里面放了很多对象。其中state就是数据源存放地，对应于与一般Vue对象里面的data
+2. state里面存放的数据是响应式的，Vue组件从store中读取数据，若是store中的数据发生改变，依赖这个数据的组件也会发生更新
+3. 它通过mapState把全局的 state 和 getters 映射到当前组件的 computed 计算属性中
+
+
+
+### **vuex的Getter特性是？**
+
+1. getters 可以对State进行计算操作，它就是Store的计算属
+2. 虽然在组件内也可以做计算属性，但是getters 可以在多组件之间复用
+3. 如果一个状态只在一个组件内使用，是可以不用getters
+
+
+
+### **vuex的Action 特性是?**
+
+Action 类似于 mutation，不同在于：
+
+- Action 提交的是 mutation，而不是直接变更状态。
+- Action 可以包含任意异步操作
+
+
+
+### **Vue.js中ajax请求代码应该写在组件的methods中还是vuex的actions中**
+
+如果请求来的数据是不是要被其他组件公用，仅仅在请求的组件内使用，就不需要放入vuex 的state里。
+
+如果被其他地方复用，这个很大几率上是需要的，如果需要，请将请求放入action里，方便复用，并包装成promise返回，在调用处用async await处理返回的数据。如果不要复用这个请求，那么直接写在vue文件里很方便。
+
+
+
+### **不用Vuex会带来什么问题？**
+
+1. 可维护性会下降，你要想修改数据，你得维护三个地方
+2. 可读性会下降，因为一个组件里的数据，你根本就看不出来是从哪来的
+3. 增加耦合，大量的上传派发，会让耦合性大大的增加，本来Vue用Component就是为了减少耦合，现在这么用，和组件化的初衷相背。
+
+但兄弟组件有大量通信的，建议一定要用，不管大项目和小项目，因为这样会省很多事
+
+
+
+### 使用Vuex只需执行 `Vue.use(Vuex)`，并在Vue的配置中传入一个store对象的示例，store是如何实现注入的
+
+`Vue.use(Vuex)` 方法执行的是install方法，它实现了Vue实例对象的init方法封装和注入，使传入的store对象被设置到Vue上下文环境的$store中。因此在Vue Component任意地方都能够通过`this.$store`访问到该store。
+
+
+
+### state内部支持模块配置和模块嵌套，如何实现的？
+
+在store构造方法中有makeLocalContext方法，所有module都会有一个local context，根据配置时的path进行匹配。所以执行如`dispatch('submitOrder', payload)`这类action时，默认的拿到都是module的local state，如果要访问最外层或者是其他module的state，只能从rootState按照path路径逐步进行访问。
+
+
+
+### *在执行dispatch触发action(commit同理)的时候，只需传入(type, payload)，action执行函数中第一个参数store从哪里获取的？*
+
+store初始化时，所有配置的action和mutation以及getters均被封装过。在执行如`dispatch('submitOrder', payload)`的时候，actions中type为submitOrder的所有处理方法都是被封装后的，其第一个参数为当前的store对象，所以能够获取到 `{ dispatch, commit, state, rootState }` 等数据。
+
+
+
+### *Vuex如何区分state是外部直接修改，还是通过mutation方法修改的？*
+
+Vuex中修改state的唯一渠道就是执行 `commit('xx', payload)` 方法，其底层通过执行 `this._withCommit(fn)` 设置_committing标志变量为true，然后才能修改state，修改完毕还需要还原_committing变量。外部修改虽然能够直接修改state，但是并没有修改_committing标志位，所以只要watch一下state，state change时判断是否_committing值为true，即可判断修改的合法性。
+
+
+
+## webpack与gulp的区别
+
+webpack -- 模块化加载器兼打包工具
+
+其实webpack只是具有前端构建的功能而已，其实本质来说webpack是一种模块化的解决方案类似require.js一样，只不过通过插件实现了构建工具的一些功能，例如通过less－loader可以编译less为css并作为模块可以被调用。gulp是通过一系列插件将原本复杂繁琐的任务自动化，是一个纯粹的工具，并不能将你的css等非js资源模块化，但是webpack可以做到这些。总的来说，gulp是一个自动化任务的工具，所以你可以通过gulp来配置webpack的文件。
+
+　webpack的优点如下：
+
+　　　　1. webpack 遵循commonJS 的形式，但对 AMD/CMD 的支持也很全面，方便旧项目进行代码迁移。
+
+　　　　2. 能被模块化的不仅仅是 JS ，所有的静态资源，例如css，图片等都能模块化，即以require的方式引入。
+
+　　　　3. 开发便捷，能替代部分 grunt/gulp 的工作，比如打包、压缩混淆、图片转base64等。 
+
+
+
+ 
+
+## 如何实现表格固定表头功能（最顶部与最左侧）
+
+主要使用了二个css属性
+
+- table-layout: fixed
+- posotion: sticky
+
+### table-layout
+
+为了让表格呈现滚动效果，必须设定table-layout: fixed，并且给与表格宽度
+
+
+
+```css
+table {
+ table-layout: fixed;
+ width: 100%;
+}
+```
+
+### position
+
+固定表格的行列需要使用到`posotion: sticky`设定
+ sticky的表现类似于relative和fixed的合体，在超过目标区域时，他会固定于目标位置
+
+**注意:** `posotion: sticky`应用于table时，只能作用于`<th>`和`<td>`，并且必须定义目标位置left / right / top / bottom来实现固定效果
+
+```css
+thead tr th {
+ position:sticky;
+ top:0;
+}
+```
+
+大致代码：
+
+```css
+table {
+    border-collapse:separate;
+    table-layout: fixed;
+    width: 100%; /* 固定寬度 */
+
+}
+
+td:first-child, th:first-child {
+
+    position:sticky;
+
+    left:0; /* 首行在左 */
+
+    z-index:1;
+
+    background-color:lightpink;
+
+}
+
+thead tr th {
+
+    position:sticky;
+
+    top:0; /* 第一列最上 */
+
+}
+```
+

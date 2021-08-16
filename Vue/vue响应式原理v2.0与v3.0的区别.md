@@ -126,7 +126,7 @@ const p = new Proxy(target, handler)
 
 结果
 
-![image-20201204154809023](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\image-20201204154809023.png)
+![image-20201204154809023](vue响应式原理v2.0与v3.0的区别/image-20201204154809023.png)
 
 由上可知，新增或编辑属性，并不需要重新添加响应式处理，都能监听的到
 因为 Proxy 是对对象的操作，只要你访问对象，就会走到 Proxy 的逻辑中

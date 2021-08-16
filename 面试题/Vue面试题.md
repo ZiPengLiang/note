@@ -128,7 +128,7 @@ MVC模式的意思是，软件可以分成三个部分。
 
 通信方式：
 
-​	![MVC模式](C:\Users\kx\Pictures\Screenshots\MVC.png)
+​	![MVC模式](Vue面试题/MVC.png)
 
 1. View 传送指令到 Controller
 2. Controller 完成业务逻辑后，要求 Model 改变状态
@@ -148,7 +148,7 @@ MVC模式的意思是，软件可以分成三个部分。
 
 MVP 模式将 Controller 改名为 Presenter，同时改变了通信方向。
 
-![MVP模式](C:\Users\kx\Pictures\Screenshots\MVP.png)
+![MVP模式](Vue面试题/MVP.png)
 
 - 各部分之间的通信，都是双向的。
 - View 与 Model 不发生联系，都通过 Presenter 传递。
@@ -450,14 +450,14 @@ Vuex 是一个专为 Vue.js 应用程序开发的**状态管理模式**。
 
 - actions，响应在 view 上的用户输入导致的状态变化。下图单向数据流示意图：
 
-  <img src="C:\Users\kx\Pictures\Screenshots\flow.png" alt="flow" style="zoom:30%;" />
+  <img src="Vue面试题/flow.png" style="zoom:150%;" />
 
   vuex，多组件共享状态，因-单向数据流简洁性很容易被破坏：
 
   - 多个视图依赖于同一状态。
   - 来自不同视图的行为需要变更同一状态。
 
-  ![vuex](C:\Users\kx\Pictures\Screenshots\vuex.png)
+  ![vuex](Vue面试题/vuex.png)
 
 
 

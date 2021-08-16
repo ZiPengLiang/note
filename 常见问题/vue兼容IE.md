@@ -20,7 +20,7 @@
 
 ​		如图下所示
 
-​			![1571967941644](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\1571967941644.png)
+​			![1571967941644](vue兼容IE/1571967941644.png)
 
 ​	否则是无法应用babel-polyfill
 
@@ -40,17 +40,17 @@
 
 webpack.base.conf.js 就在该文件中
 
-![1571968315173](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\1571968315173.png)
+![1571968315173](vue兼容IE/1571968315173.png)
 
 配置如下：
 
 ​	未替换换前的配置
 
-![1571968380488](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\1571968380488.png)
+![1571968380488](vue兼容IE/1571968380488.png)
 
 ​	替换后的配置
 
-​	![1571968462815](C:\Users\kx\AppData\Roaming\Typora\typora-user-images\1571968462815.png)
+​	![1571968462815](vue兼容IE/1571968462815.png)
 
 
 
