@@ -165,13 +165,55 @@ Promise.race([p5,p6]).then(res=>{
 
 
 
-#### 		4.**Promise.resolve(value)**
+#### 		4、**Promise.resolve(value)**
 
 ​	`Promise.resolve(value)`方法返回一个以给定值解析后的`Promise` 对象。如果该值为promise，返回这个promise；如果这个值是thenable（即带有`"then" 方法`)），返回的promise会“跟随”这个thenable的对象，采用它的最终状态；否则返回的promise将以此值完成。此函数将类promise对象的多层嵌套展平。
 
 
 
+#### 5、Promise.allSettled()
 
+返回一个在所有给定的promise都已经`fulfilled`或`rejected`后的promise，并带有一个对象数组，每个对象表示对应的promise结果。
+
+每个promise都得到结果后，不管是成功或则失败，都会等到全部完成过后才返回
+
+```js
+const promise1 = Promise.resolve(3);
+const promise2 = new Promise((resolve, reject) => setTimeout(reject, 100, 'foo'));
+const promises = [promise1, promise2];
+
+Promise.allSettled(promises).
+  then((results) => results.forEach((result) => console.log(result.status)));
+
+// "fulfilled"
+// "rejected"
+```
+
+
+
+#### 6、Promise.any()
+
+接收一个`Promise`可迭代对象，只要其中的一个 `promise` 成功，就返回那个已经成功的 `promise` 。如果可迭代对象中没有一个 `promise` 成功（即所有的 `promises` 都失败/拒绝），就返回一个失败的 `promise `和[`AggregateError`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/AggregateError)类型的实例，它是 [`Error`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Error) 的一个子类，用于把单一的错误集合在一起。本质上，这个方法和`Promise.all()`是相反的。
+
+```js
+const pErr = new Promise((resolve, reject) => {
+  reject("总是失败");
+});
+
+const pSlow = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, "最终完成");
+});
+
+const pFast = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "很快完成");
+});
+
+Promise.any([pErr, pSlow, pFast]).then((value) => {
+  console.log(value);
+  // pFast fulfils first
+})
+// 期望输出: "很快完成"
+```
 
 ### Promise.prototype
 

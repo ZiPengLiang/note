@@ -1022,7 +1022,6 @@ Vue.js 是一套构建用户界面的渐进式框架。与其他重量级框架�
    React
 
    ​	React基于状态机，手动优化，数据不可变，需要setState驱动新的state替换老的state。当数据改变时，以组件为根目录，默认全部重新渲染, 所以 React 中会需要 shouldComponentUpdate 这个生命周期函数方法来进行控制
-   
 
 
 
@@ -1559,4 +1558,363 @@ thead tr th {
 }
 ```
 
+## Javascript本地存储的方式有哪些？区别及应用场景？
+
+### 方式
+
+- cookie
+- sessionStorage
+- localStorage
+- indexedDB
+
+#### cookie
+
+类型为「小型文本文件」，指某些网站为了辨别用户身份而储存在用户本地终端上的数据。是为了解决 `HTTP`无状态导致的问题
+
+`cookie`在每次请求中都会被发送，如果不使用 `HTTPS`并对其加密，其保存的信息很容易被窃取，导致安全风险。
+
+##### 属性
+
+`cookie`常用的属性如下：
+
+- Expires 用于设置 Cookie 的过期时间
+
+```js
+Expires=Wed, 21 Oct 2015 07:28:00 GMT
+```
+
+- Max-Age 用于设置在 Cookie 失效之前需要经过的秒数（优先级比`Expires`高）
+
+```js
+Max-Age=604800
+```
+
+- `Domain`指定了 `Cookie` 可以送达的主机名
+- `Path`指定了一个 `URL`路径，这个路径必须出现在要请求的资源的路径中才可以发送 `Cookie` 首部
+
+```js
+Path=/docs   # /docs/Web/ 下的资源会带 Cookie 首部
+```
+
+- 标记为 `Secure`的 `Cookie`只应通过被`HTTPS`协议加密过的请求发送给服务端
+
+
+
+#### localStorage
+
+`HTML5`新方法，IE8及以上浏览器都兼容
+
+##### 特点
+
+- 生命周期：持久化的本地存储，除非主动删除数据，否则数据是永远不会过期的
+- 存储的信息在同一域中是共享的
+- 当本页操作（新增、修改、删除）了`localStorage`的时候，本页面不会触发`storage`事件,但是别的页面会触发`storage`事件。
+- 大小：5M（跟浏览器厂商有关系）
+- `localStorage`本质上是对字符串的读取，如果存储内容多的话会消耗内存空间，会导致页面变卡
+- 受同源策略的限制
+
+##### 使用
+
+设置
+
+```js
+localStorage.setItem('username','cfangxu');
+```
+
+获取
+
+```js
+localStorage.getItem('username')
+```
+
+获取键名
+
+```js
+localStorage.key(0) //获取第一个键名
+```
+
+删除
+
+```js
+localStorage.removeItem('username')
+```
+
+一次性清除所有存储
+
+```js
+localStorage.clear()
+```
+
+##### 缺点
+
+- 无法像`Cookie`一样设置过期时间
+- 只能存入字符串，无法直接存对象
+
+
+
+#### sessionStorage
+
+`sessionStorage`和 `localStorage`使用方法基本一致，唯一不同的是生命周期，一旦页面（会话）关闭，`sessionStorage` 将会删除数据
+
+
+
+#### indexedDB
+
+`indexedDB`是一种低级API，用于客户端存储大量结构化数据(包括, 文件/ blobs)。该API使用索引来实现对该数据的高性能搜索
+
+虽然 `Web Storage`对于存储较少量的数据很有用，但对于存储更大量的结构化数据来说，这种方法不太有用。`IndexedDB`提供了一个解决方案
+
+##### 优点：
+
+- 储存量理论上没有上限
+- 所有操作都是异步的，相比 `LocalStorage` 同步操作性能更高，尤其是数据量较大时
+- 原生支持储存`JS`的对象
+- 是个正经的数据库，意味着数据库能干的事它都能干
+
+##### 缺点：
+
+- 操作非常繁琐
+- 本身有一定门槛
+
+关于`indexedDB`的使用基本使用步骤如下：
+
+- 打开数据库并且开始一个事务
+- 创建一个 `object store`
+- 构建一个请求来执行一些数据库操作，像增加或提取数据等。
+- 通过监听正确类型的 `DOM` 事件以等待操作完成。
+- 在操作结果上进行一些操作（可以在 `request`对象中找到）
+
+关于使用`indexdb`的使用会比较繁琐，大家可以通过使用`Godb.js`库进行缓存，最大化的降低操作难度
+
+
+
+### 区别
+
+关于`cookie`、`sessionStorage`、`localStorage`三者的区别主要如下：
+
+- 存储大小：`cookie`数据大小不能超过`4k`，`sessionStorage`和`localStorage`虽然也有存储大小的限制，但比`cookie`大得多，可以达到5M或更大
+- 有效时间：`localStorage`存储持久数据，浏览器关闭后数据不丢失除非主动删除数据； `sessionStorage`数据在当前浏览器窗口关闭后自动删除；`cookie`设置的`cookie`过期时间之前一直有效，即使窗口或浏览器关闭
+- 数据与服务器之间的交互方式，`cookie`的数据会自动的传递到服务器，服务器端也可以写`cookie`到客户端； `sessionStorage`和`localStorage`不会自动把数据发给服务器，仅在本地保存
+
+### 应用场景
+
+在了解了上述的前端的缓存方式后，我们可以看看针对不对场景的使用选择：
+
+- 标记用户与跟踪用户行为的情况，推荐使用`cookie`
+- 适合长期保存在本地的数据（令牌），推荐使用`localStorage`
+- 敏感账号一次性登录，推荐使用`sessionStorage`
+- 存储大量数据的情况、在线文档（富文本编辑器）保存编辑历史的情况，推荐使用`indexedDB`
+
+ 
+
+## 深拷贝浅拷贝的区别？如何实现一个深拷贝？
+
+### 数据类型存储
+
+`JavaScript`中存在两大数据类型：
+
+- 基本类型
+- 引用类型
+
+基本类型数据保存在在栈内存中
+
+引用类型数据保存在堆内存中，引用数据类型的变量是一个指向堆内存中实际对象的引用，存在栈中
+
+### 浅拷贝
+
+浅拷贝，指的是创建新的数据，这个数据有着原始数据属性值的一份精确拷贝
+
+如果属性是基本类型，拷贝的就是基本类型的值。如果属性是引用类型，拷贝的就是内存地址
+
+```js
+function shallowClone(obj) {
+    const newObj = {};
+    for(let prop in obj) {
+        if(obj.hasOwnProperty(prop)){
+            newObj[prop] = obj[prop];
+        }
+    }
+    return newObj;
+}
+```
+
+在`JavaScript`中，存在浅拷贝的现象有：
+
+- `Object.assign`
+
+  ```js
+  var obj = {
+      age: 18,
+      nature: ['smart', 'good'],
+      names: {
+          name1: 'fx',
+          name2: 'xka'
+      },
+      love: function () {
+          console.log('fx is a great girl')
+      }
+  }
+  var newObj = Object.assign({}, fxObj);
+  ```
+
+- `Array.prototype.slice()`, `Array.prototype.concat()`
+
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = fxArr.slice(0)
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = fxArr.concat()
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+
+- 使用拓展运算符实现的复制
+
+  ```js
+  const fxArr = ["One", "Two", "Three"]
+  const fxArrs = [...fxArr]
+  fxArrs[1] = "love";
+  console.log(fxArr) // ["One", "Two", "Three"]
+  console.log(fxArrs) // ["One", "love", "Three"]
+  ```
+
+### 深拷贝
+
+深拷贝开辟一个新的栈，两个对象属完成相同，但是对应两个不同的地址，修改一个对象的属性，不会改变另一个对象的属性
+
+常见的深拷贝方式有：
+
+- _.cloneDeep()
+
+```js
+const _ = require('lodash');
+const obj1 = {
+    a: 1,
+    b: { f: { g: 1 } },
+    c: [1, 2, 3]
+};
+const obj2 = _.cloneDeep(obj1);
+console.log(obj1.b.f === obj2.b.f);// false
+```
+
+- jQuery.extend()
+
+```js
+const $ = require('jquery');
+const obj1 = {
+    a: 1,
+    b: { f: { g: 1 } },
+    c: [1, 2, 3]
+};
+const obj2 = $.extend(true, {}, obj1);
+console.log(obj1.b.f === obj2.b.f); // false
+```
+
+- JSON.stringify()
+
+```js
+const obj2=JSON.parse(JSON.stringify(obj1));
+```
+
+这种方式存在弊端，会忽略`undefined`、`symbol`和`函数`
+
+```js
+const obj = {
+    name: 'A',
+    name1: undefined,
+    name3: function() {},
+    name4:  Symbol('A')
+}
+const obj2 = JSON.parse(JSON.stringify(obj));
+console.log(obj2); // {name: "A"}
+```
+
+- 手写循环递归
+
+```js
+function deepClone(obj, hash = new WeakMap()) {
+  if (obj === null) return obj; // 如果是null或者undefined我就不进行拷贝操作
+  if (obj instanceof Date) return new Date(obj);
+  if (obj instanceof RegExp) return new RegExp(obj);
+  // 可能是对象或者普通的值  如果是函数的话是不需要深拷贝
+  if (typeof obj !== "object") return obj;
+  // 是对象的话就要进行深拷贝
+  if (hash.get(obj)) return hash.get(obj);
+  let cloneObj = new obj.constructor();
+  // 找到的是所属类原型上的constructor,而原型上的 constructor指向的是当前类本身
+  hash.set(obj, cloneObj);
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      // 实现一个递归拷贝
+      cloneObj[key] = deepClone(obj[key], hash);
+    }
+  }
+  return cloneObj;
+}
+```
+
+### 总结
+
+前提为拷贝类型为引用类型的情况下：
+
+- 浅拷贝是拷贝一层，属性为对象时，浅拷贝是复制，两个对象指向同一个地址
+- 深拷贝是递归拷贝深层次，属性为对象时，深拷贝是新开栈，两个对象指向不同的地址
+
+## 解决vuex页面刷新数据丢失问题
+
+- 将vuex中的数据直接保存到浏览器缓存中（sessionStorage、localStorage、cookie）
+- 在页面刷新的时候再次请求远程数据，使之动态更新vuex数据
+- 在父页面向后台请求远程数据，并且在页面刷新前将vuex的数据先保存至sessionStorage（以防请求数据量过大页面加载时拿不到返回的数据）
+  
+
+
+
+## for in和for of 的区别和原理
+
+for in是获取属性名，for of获取属性值
+
+### for in的特点
+
+for in 循环返回的值都是数据结构的**键名**。
+
+遍历对象返回的是对象的key值，遍历数组返回的是数组的下标。
+
+还会遍历原型上的值和手动添加的值
+
+总的来说：for in适合遍历对象。
+
+### for of的特点
+
+for of 循环获取一对键值中的**键值**。
+
+一个数据结构只要部署了Symbol.iterator属性，就被视为具有iterator接口，可以使用for of。
+
+for of不同于forEach，for of是可以break，continue，return配合使用，for of 循环可以随时退出循环。
+
+总的来说：for of遍历所有数据结构的统一接口。
+
+
+
+## computed和watch的区别
+
+### **性质**
+
+1. **methods** 里面定义的是**函数**，仍然需要去调用它。
+2. **computed** 是**计算属性**，事实上和 data 对象里的数据属性是同一类的（使用上）。
+3. **watch：**类似于监听机制+事件机制
+
+### watch 和 computed  区别
+
+1. 功能上：computed是计算属性，watch是监听一个值的变化，然后执行对应的回调。
+2.  是否调用缓存：computed中的函数所依赖的属性没有发生变化，那么调用当前的函数的时候会从缓存中读取，而watch在每次监听的值发生变化的时候都会执行回调。
+3. 是否调用return：computed中的函数必须要用return返回，watch中的函数不是必须要用return
+4. watch擅长处理的场景：一个数据影响多个数据 -------搜索框。
+5. computed擅长处理的场景：一个数据受多个数据影响 -- 使用场景：当一个值受多个属性影响的时候--------购物车商品结算
 
