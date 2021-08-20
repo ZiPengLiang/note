@@ -1238,8 +1238,6 @@ vuex实现了单向的数据流，在全局定义了一个State对象用来存�
 
 1. 比较的过程中，循环从两边向中间收拢
 
-比较实例：[你了解vue的diff算法吗](
-
 
 
 ## vue-router有哪几种导航钩子？
@@ -1463,13 +1461,13 @@ Action 类似于 mutation，不同在于：
 
 
 
-### *在执行dispatch触发action(commit同理)的时候，只需传入(type, payload)，action执行函数中第一个参数store从哪里获取的？*
+### 在执行dispatch触发action(commit同理)的时候，只需传入(type, payload)，action执行函数中第一个参数store从哪里获取的？
 
 store初始化时，所有配置的action和mutation以及getters均被封装过。在执行如`dispatch('submitOrder', payload)`的时候，actions中type为submitOrder的所有处理方法都是被封装后的，其第一个参数为当前的store对象，所以能够获取到 `{ dispatch, commit, state, rootState }` 等数据。
 
 
 
-### *Vuex如何区分state是外部直接修改，还是通过mutation方法修改的？*
+### Vuex如何区分state是外部直接修改，还是通过mutation方法修改的？
 
 Vuex中修改state的唯一渠道就是执行 `commit('xx', payload)` 方法，其底层通过执行 `this._withCommit(fn)` 设置_committing标志变量为true，然后才能修改state，修改完毕还需要还原_committing变量。外部修改虽然能够直接修改state，但是并没有修改_committing标志位，所以只要watch一下state，state change时判断是否_committing值为true，即可判断修改的合法性。
 
@@ -1483,11 +1481,9 @@ webpack -- 模块化加载器兼打包工具
 
 　webpack的优点如下：
 
-　　　　1. webpack 遵循commonJS 的形式，但对 AMD/CMD 的支持也很全面，方便旧项目进行代码迁移。
-
-　　　　2. 能被模块化的不仅仅是 JS ，所有的静态资源，例如css，图片等都能模块化，即以require的方式引入。
-
-　　　　3. 开发便捷，能替代部分 grunt/gulp 的工作，比如打包、压缩混淆、图片转base64等。 
+   　　　　1. webpack 遵循commonJS 的形式，但对 AMD/CMD 的支持也很全面，方便旧项目进行代码迁移。
+      　　　　2. 能被模块化的不仅仅是 JS ，所有的静态资源，例如css，图片等都能模块化，即以require的方式引入。
+      　　　　3. 开发便捷，能替代部分 grunt/gulp 的工作，比如打包、压缩混淆、图片转base64等。 
 
 
 
@@ -1872,7 +1868,6 @@ function deepClone(obj, hash = new WeakMap()) {
 - 将vuex中的数据直接保存到浏览器缓存中（sessionStorage、localStorage、cookie）
 - 在页面刷新的时候再次请求远程数据，使之动态更新vuex数据
 - 在父页面向后台请求远程数据，并且在页面刷新前将vuex的数据先保存至sessionStorage（以防请求数据量过大页面加载时拿不到返回的数据）
-  
 
 
 
@@ -1917,4 +1912,16 @@ for of不同于forEach，for of是可以break，continue，return配合使用，
 3. 是否调用return：computed中的函数必须要用return返回，watch中的函数不是必须要用return
 4. watch擅长处理的场景：一个数据影响多个数据 -------搜索框。
 5. computed擅长处理的场景：一个数据受多个数据影响 -- 使用场景：当一个值受多个属性影响的时候--------购物车商品结算
+
+
+
+## Vue的组件冲突
+
+- css样式冲突
+
+  设置scoped --设置为组件空间私有(避免与其它全局css干扰)
+
+- 组件名称冲突
+
+  把引用的组件作为局部组件，在components中声明为其它你喜欢的名称
 
