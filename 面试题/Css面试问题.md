@@ -1482,8 +1482,8 @@ webpack -- 模块化加载器兼打包工具
 　webpack的优点如下：
 
    　　　　1. webpack 遵循commonJS 的形式，但对 AMD/CMD 的支持也很全面，方便旧项目进行代码迁移。
-      　　　　2. 能被模块化的不仅仅是 JS ，所有的静态资源，例如css，图片等都能模块化，即以require的方式引入。
-      　　　　3. 开发便捷，能替代部分 grunt/gulp 的工作，比如打包、压缩混淆、图片转base64等。 
+            　　　　2. 能被模块化的不仅仅是 JS ，所有的静态资源，例如css，图片等都能模块化，即以require的方式引入。
+                        　　　　3. 开发便捷，能替代部分 grunt/gulp 的工作，比如打包、压缩混淆、图片转base64等。 
 
 
 
@@ -1924,4 +1924,142 @@ for of不同于forEach，for of是可以break，continue，return配合使用，
 - 组件名称冲突
 
   把引用的组件作为局部组件，在components中声明为其它你喜欢的名称
+
+
+
+## Vue中的过滤器了解吗？过滤器的应用场景有哪些？
+
+### 定义
+
+过滤器（`filter`）是输送介质管道上不可缺少的一种装置
+
+过滤器实质不改变原始数据，只是对数据进行加工处理后返回过滤后的数据再进行调用处理，我们也可以理解其为一个纯函数
+
+ps: `Vue3`中已废弃`filter`
+
+### 如何用
+
+`vue`中的过滤器可以用在两个地方：双花括号插值和 `v-bind` 表达式，过滤器应该被添加在 `JavaScript`表达式的尾部，由“管道”符号指示：
+
+```js
+<!-- 在双花括号中 -->
+{{ message | capitalize }}
+
+<!-- 在 `v-bind` 中 -->
+<div v-bind:id="rawId | formatId"></div>
+```
+
+### 定义filter
+
+局部
+
+```js
+filters: {
+  capitalize: function (value) {
+    if (!value) return ''
+    value = value.toString()
+    return value.charAt(0).toUpperCase() + value.slice(1)
+  }
+}
+```
+
+全局
+
+```js
+Vue.filter('capitalize', function (value) {
+  if (!value) return ''
+  value = value.toString()
+  return value.charAt(0).toUpperCase() + value.slice(1)
+})
+```
+
+优先级：局部>全局
+
+过滤器可以串联：
+
+```text
+{{ message | filterA | filterB }}
+```
+
+在这个例子中，`filterA` 被定义为接收单个参数的过滤器函数，表达式 `message` 的值将作为参数传入到函数中。然后继续调用同样被定义为接收单个参数的过滤器函数 `filterB`，将 `filterA` 的结果传递到 `filterB` 中。
+
+过滤器是 `JavaScript`函数，因此可以接收参数：
+
+```text
+{{ message | filterA('arg1', arg2) }
+```
+
+这里，`filterA` 被定义为接收三个参数的过滤器函数。
+
+其中 `message` 的值作为第一个参数，普通字符串 `'arg1'` 作为第二个参数，表达式 `arg2` 的值作为第三个参数
+
+### 小结：
+
+- 部过滤器优先于全局过滤器被调用
+- 一个表达式可以使用多个过滤器。过滤器之间需要用管道符“|”隔开。其执行顺序从左往右
+
+### 应用场景
+
+单位转换、数字打点、文本格式化、时间格式化之类的等
+
+
+
+## vue动态加载组件
+
+```html
+<template>
+    <div class="business-container">
+        <!-- component 标签已经代表当前这个是一个组件  -->
+        <!-- 只需要加载computed里计算出来的组件即可 -->
+        <component v-bind:is="currentBizComponent"></component>
+    </div>
+</template>
+
+<script>
+    import BusinessComponentA from './components/BusinessComponentA'
+    import BusinessComponentB from './components/BusinessComponentB'
+    import BusinessComponentC from './components/BusinessComponentC'
+
+    export default {
+        components: { BusinessComponentA, BusinessComponentB, BusinessComponentC },
+        data: function () {
+            return {
+            }
+        },
+        computed: {
+            // 业务类型
+            condition:function(){
+                // 当前页面数据 bizDoc
+                return this.$store.state.bizDoc.type // should return A || B || C
+            },
+            //  当前应该加载的组件 
+            currentBizComponent: function () {
+                return 'BusinessComponent' +  this.condition
+            }
+        }
+    }
+</script>
+```
+
+可配合`keep-alive`
+
+## Vue.observable你有了解过吗
+
+### Observable 是什么
+
+`Observable` 翻译过来我们可以理解成**可观察的**
+
+定义
+
+> `Vue.observable`，让一个对象变成响应式数据。`Vue` 内部会用它来处理 `data` 函数返回的对象
+
+返回的对象可以直接用于渲染函数和计算属性内，并且会在发生变更时触发相应的更新。也可以作为最小化的跨组件状态存储器
+
+```js
+Vue.observable({ count : 1})
+```
+
+### 使用场景
+
+非父子组件通信时，可以使用通常的`bus`或者使用`vuex`，但是实现的功能不是太复杂，而使用上面两个又有点繁琐。这时，`observable`就是一个很好的选择
 
