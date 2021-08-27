@@ -2125,3 +2125,86 @@ Dropped refs/stash@{0} (5d677e2ee266f39ea296182fb2354265b91b3b2a)
 
 在master分支上修复的bug，想要合并到当前dev分支，可以用`git cherry-pick `命令，把bug提交的修改“复制”到当前分支，避免重复劳动
 
+
+
+## axios取消请求
+
+方法一：可以使用 CancelToken.source 工厂方法创建 cancel token
+
+```js
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
+axios.get('/user/12345', {
+  cancelToken: source.token
+}).catch(function(thrown) {
+  if (axios.isCancel(thrown)) {
+    console.log('Request canceled', thrown.message);
+  } else {
+     // 处理错误
+  }
+});
+
+axios.post('/user/12345', {
+  name: 'new name'
+}, {
+  cancelToken: source.token
+})
+
+// 取消请求（message 参数是可选的）
+source.cancel('Operation canceled by the user.');
+```
+
+方法二： 通过传递一个 executor 函数到 CancelToken 的构造函数来创建 cancel token
+
+```js
+const CancelToken = axios.CancelToken;
+let cancel;
+
+axios.get('/user/12345', {
+  cancelToken: new CancelToken(function executor(c) {
+    // executor 函数接收一个 cancel 函数作为参数
+    cancel = c;
+  })
+});
+
+// cancel the request
+cancel();
+```
+
+
+方法一有个问题，axios的cancel方法会把即将要发出的请求取消掉
+
+
+
+
+
+## 假如有两个请求接口，不同请求格式如何去做？
+
+一般的做法是创建两个axios实例
+
+```jsx
+const instance1 = axios.create({
+      baseurl:'http://localhost:8080',
+      timeout:'1000'
+})
+
+const instance2 = axios.create({
+      baseurl:'http://localhost:9090',
+      timeout:'3000'
+})
+
+//instance1这里用到的参数有 baseurl,timeout,method,url
+instance1.get('/userinfo').then(res=>{
+  console.log(res)
+})
+
+//instance2这里用到的参数有 baseurl,timeout,method,url，params,并且对timeout进行了修改
+instance1.get('/orderlist',{
+    timeout:'5000'
+    params:{}
+}).then(res=>{
+  console.log(res)
+})
+```
+
