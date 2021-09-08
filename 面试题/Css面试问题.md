@@ -936,6 +936,8 @@ jsonp的核心则是动态添加<script>标签来调用服务器提供的js脚�
 
 `AMD`采用异步方式加载模块，模块的加载不影响它后面语句的运行
 
+RequireJS是一个工具库，主要用于客户端的模块管理。的模块管理遵守AMD规范，基本思想是，通过define方法，将代码定义为模块；通过require方法，实现代码的模块加载。
+
 ```js
 define(['moduleA', 'moduleB', 'moduleC'], function (moduleA, moduleB, moduleC){
     // do something
@@ -1210,6 +1212,26 @@ vuex实现了单向的数据流，在全局定义了一个State对象用来存�
 ###  7.Event Bus
 
 跨组件通信` Event Bus` （Vue.prototype.bus = new Vue）其实基于*b**u**s*=*n**e**w**V**u**e*）其实基于on与$emit
+
+```js
+// main.js
+Vue.prototype.$EventBus = new Vue()
+
+//A.vue  ---发送事件
+sendMsg() {
+      EventBus.$emit("aMsg", '来自A页面的消息');
+}
+
+//B.vue -- 接收事件
+  mounted() {
+    EventBus.$on("aMsg", (msg) => {
+      // A发送来的消息
+      this.msg = msg;
+    });
+  }
+```
+
+
 
 ### 常见使用场景分为以下三类:
 
@@ -1754,6 +1776,8 @@ function shallowClone(obj) {
   ```
 
 - `Array.prototype.slice()`, `Array.prototype.concat()`
+
+   比如数组中含有对象
 
   ```js
   const fxArr = ["One", "Two", "Three"]
