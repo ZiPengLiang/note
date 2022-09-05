@@ -105,14 +105,27 @@ export default {
     console.log(props.title)
       //要想结构prop就需要使用toRefs来实现
       const  {title} = toRefs(props)
+      // const title = toRef(props, 'title')
       console.log(title.value)
   }
 }
 ```
 
+如果 title 是可选的 prop，则传入的 props 中可能没有 title 。在这种情况下，toRefs 将不会为 title 创建一个 ref 。需要使用 toRef 替代它
+
+```js
+import { toRef } from 'vue'
+setup(props) {
+  const title = toRef(props, 'title')
+  console.log(title.value)
+}
+```
+
+
+
 ##### 	`context`
 
-传递给 `setup` 函数的第二个参数是 `context`。`context` 是一个普通的 JavaScript 对象，它暴露三个组件的 property：
+传递给 `setup` 函数的第二个参数是 `context`。`context` 是一个普通的 JavaScript 对象，它暴露其他在setup中有用的值：
 
 ```js
 export default {
@@ -125,7 +138,8 @@ export default {
 
     // 触发事件 (方法)
     console.log(context.emit)
-      
+    // 暴露公共 property (函数)
+    console.log(context.expose)
   }
 }
 ```
@@ -298,6 +312,124 @@ export default {
     }) 
   }
 }
+```
+
+
+
+### Provide/Inject
+
+#### 作用：
+
+主要为高阶插件/组件库提供用例
+
+#### 场景：
+
+**由于vue有$parent属性可以让子组件访问父组件。但孙组件想要访问祖先组件就比较困难。通过provide/inject可以轻松实现跨级访问祖先组件的数据**
+
+#### vue2.0用法
+
+##### 语法：
+
+provide: Object | () => Object
+
+inject: Array<string> | { [key: string]: string | Symbol | Object }
+
+##### 例子：
+
+```js
+const app = Vue.createApp({})
+// 父组件
+app.component('todo-list', {
+  data() {
+    return {
+      todos: ['Feed a cat', 'Buy tickets']
+    }
+  },
+  provide: {
+    user: 'John Doe'
+  },
+  template: `
+    <div>
+      {{ todos.length }}
+      <!-- 模板的其余部分 -->
+    </div>
+  `
+})
+// 子组件 
+app.component('todo-list-statistics', {
+  inject: ['user'],
+  created() {
+    console.log(`Injected property: ${this.user}`) // > 注入的 property: John Doe
+  }
+})
+```
+
+#### vue 3.0 用法
+
+##### 语法：
+
+###### provide(name, value)
+
+1. name (`<String>` 类型)
+2. value
+
+###### inject(name, value)
+
+1. 要 inject 的 property 的 name
+2. 默认值 (**可选**)
+
+##### 例子：
+
+
+
+```vue
+// 父组件
+setup() {
+    provide('location', 'North Pole')
+    provide('geolocation', {
+      longitude: 90,
+      latitude: 135
+    })
+  }
+```
+
+```vue
+// 子组件
+setup() {
+    const userLocation = inject('location', 'The Universe')
+    const userGeolocation = inject('geolocation')
+
+    return {
+      userLocation,
+      userGeolocation
+    }
+  }
+```
+
+
+
+##### 只读 readonly
+
+确保通过 `provide` 传递的数据不会被 inject 的组件更改
+
+```vue
+import { provide, reactive, readonly, ref } from 'vue'
+
+setup() {
+    const location = ref('North Pole')
+    const geolocation = reactive({
+      longitude: 90,
+      latitude: 135
+    })
+
+    const updateLocation = () => {
+      location.value = 'South Pole'
+    }
+
+    provide('location', readonly(location))
+    provide('geolocation', readonly(geolocation))
+    provide('updateLocation', updateLocation)
+  }
 ```
 
 
