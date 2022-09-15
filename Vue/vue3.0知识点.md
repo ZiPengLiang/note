@@ -198,6 +198,59 @@ export default {
 }
 ```
 
+注意点：
+
+`reactive()` 返回的是一个原始对象的 `Proxy`，它和原始对象是不相等的:
+
+```js
+const raw = {}
+const proxy = reactive(raw)
+
+// 代理对象和原始对象不是全等的
+console.log(proxy === raw) // false
+
+// 为保证访问代理的一致性，对同一个原始对象调用 reactive() 会总是返回同样的代理对象，而对一个已存在的代理对象调用 reactive() 会返回其本身
+
+// 在同一个对象上调用 reactive() 会返回相同的代理
+console.log(reactive(raw) === proxy) // true
+
+// 在一个代理上调用 reactive() 会返回它自己
+console.log(reactive(proxy) === proxy) // true
+```
+
+只有代理对象是响应式的，，更改原始对象不会触发更新。因此，使用 Vue 的响应式系统的最佳实践是 **仅使用你声明对象的代理版本**。
+
+##### 局限性：
+
+1.仅对对象有效（对象、数组和 `Map`、`Set` 这样的[集合类型](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects#使用键的集合对象)），而对 `string`、`number` 和 `boolean` 这样的 [原始类型](https://developer.mozilla.org/zh-CN/docs/Glossary/Primitive) 无效。
+
+2.因为 Vue 的响应式系统是通过属性访问进行追踪的，因此我们必须始终保持对该响应式对象的相同引用。这意味着我们不可以随意地“替换”一个响应式对象，因为这将导致对初始引用的响应性连接丢失：
+
+```js
+let state = reactive({ count: 0 })
+
+// 上面的引用 ({ count: 0 }) 将不再被追踪（响应性连接已丢失！）
+state = reactive({ count: 1 })
+
+
+// n 是一个局部变量，同 state.count
+// 失去响应性连接
+let n = state.count
+// 不影响原始的 state
+n++
+
+// count 也和 state.count 失去了响应性连接
+let { count } = state
+// 不会影响原始的 state
+count++
+
+// 该函数接收一个普通数字，并且
+// 将无法跟踪 state.count 的变化
+callSomeFunction(state.count)
+```
+
+
+
 #### `toRefs`
 
 将响应式对象转换为普通对象，其中结果对象的每个 property 都是指向原始对象相应 property 的ref
