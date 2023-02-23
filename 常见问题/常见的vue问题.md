@@ -24,3 +24,14 @@ npm install element-ui
 
 ![img](常见的vue问题/20200413155022978.png)
 
+
+
+3.打开本地邮箱
+
+通过mailto协议，添加a标签
+
+```text
+mailto:johndoe@bigcorp.com // johndoe@bigcorp.com --目标又将
+```
+
+[超链接中的 mailto](https://zhuanlan.zhihu.com/p/415583405)

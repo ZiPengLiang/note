@@ -56,3 +56,5 @@ webpack.base.conf.js 就在该文件中
 
 步骤到目前就可以实现vue的项目在IE的运行了。
 
+
+
