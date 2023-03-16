@@ -19,7 +19,7 @@ BFC 即 Block Formatting Contexts (块级格式化上下文)，它属于上述�
 
 只要元素满足下面任一条件即可触发 BFC 特性：
 
-- body 根元素
+- body 根元素 -- html根元素才是创建BFC的元素
 - 浮动元素：float 除 none 以外的值
 - 绝对定位元素：position (absolute、fixed)
 - display 为 inline-block、table-cells、flex
