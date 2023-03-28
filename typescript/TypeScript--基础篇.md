@@ -1,0 +1,543 @@
+# TypeScript--基础篇
+
+### 基本数据类型
+
+#### 数字
+
+```typescript
+let num: number = 6; //ok
+let num: number = '6'; //error
+```
+
+#### 布尔型
+
+```typescript
+let isDone :boolean = false;
+```
+
+#### 字符串
+
+```typescript
+let string1 :string = 'bob';
+let string2 :string = `你好啊？${name}`; //字符串模板
+```
+
+#### 数组
+
+```typescript
+//2种定义方法
+//第一种，元素后面直接接元素类型加数组
+let arr1:number[] =[1,2,3,4,5,6];
+//第二种，通过Array来定义
+let arr2 :Array<number> = [1,2,3,4,5];
+```
+
+#### 元组 Tuple
+
+元组类型允许表示一个已知元素数量和类型的数组，各元素的类型不必相同
+
+```typescript
+let x:[string,number];
+
+x = ['hellow',1]; //ok
+
+x = [1,'hellow']; //error
+//当访问一个越界的元素，会使用联合类型替代：
+x[3] = 66; //ok
+x[4] = [7]; //false
+x[5] =false; //false
+
+//由上述可知typescript给x定义为一个能有string和number类型的数组，因此它不能寸其他类型的数据
+```
+
+#### 枚举
+
+`enum`类型是对JavaScript标准数据类型的一个补充
+
+```typescript
+enum Color {Red = 1,Green,Blue}
+
+let c: Color = Color.Green;
+
+let c: string = Color[1] 
+let c2: string = Color[2] 
+console.log(c) // Red
+console.log(c2) // Green	
+```
+
+#### Any
+
+有时候，我们会想要为那些在编程阶段还不清楚类型的变量指定一个类型.
+
+ 这种情况下，我们不希望类型检查器对这些值进行检查而是直接让它们通过编译阶段的检查。 那么我们可以使用 `any`类型来标记这些变量
+
+```typescript
+let notStatus:any = 4
+notStatus = 'nihao a'; //ok
+notStatus false ;//ok
+
+//当any用于数组中时，可以让数组包含不同的类型
+let list:any[] = [1,true,'nihoa a '] //ok
+```
+
+#### Void
+
+某种程度上来说，`void`类型像是与`any`类型相反，它表示没有任何类型。 当一个函数没有返回值时，你通常会见到其返回值类型是 `void`
+
+```typescript
+function warnUser(): void {
+    console.log("This is my warning message");
+}
+//声明一个void类型的变量没有什么用处，因为该变量只能为它赋予underfined和null
+let unusable: void = undefined;
+```
+
+#### Null 和Underfined
+
+TypeScript里，`undefined`和`null`两者各自有自己的类型分别叫做`undefined`和`null`。 和 `void`相似，它们的本身的类型用处不是很大
+
+```typescript
+let u: undefined = undefined;
+let n: null = null;
+```
+
+默认情况下`null`和`undefined`是所有类型的子类型。 就是说你可以把 `null`和`undefined`赋值给`number`类型的变量。
+
+然而，当你指定了`--strictNullChecks`标记，`null`和`undefined`只能赋值给`void`和它们各自。 这能避免 *很多*常见的问题。 也许在某处你想传入一个 `string`或`null`或`undefined`，你可以使用联合类型`string | null | undefined`。 再次说明，稍后我们会介绍联合类型。
+
+> 注意：我们鼓励尽可能地使用`--strictNullChecks`，但在本手册里我们假设这个标记是关闭的。
+
+#### Never
+
+`never`类型表示的是那些永不存在的值的类型。
+
+例如：
+
+ `never`类型是那些总是会抛出异常或根本就不会有返回值的函数表达式或箭头函数表达式的返回值类型；
+
+ 变量也可能是 `never`类型，当它们被永不为真的类型保护所约束时。
+
+`never`类型是任何类型的子类型，也可以赋值给任何类型；然而，*没有*类型是`never`的子类型或可以赋值给`never`类型（除了`never`本身之外）。 即使 `any`也不可以赋值给`never`。
+
+```typescript
+// 返回never的函数必须存在无法达到的终点
+function error(message: string): never {
+    throw new Error(message);
+}
+
+// 推断的返回值类型为never
+function fail() {
+    return error("Something failed");
+}
+
+// 返回never的函数必须存在无法达到的终点
+function infiniteLoop(): never {
+    while (true) {
+    }
+}
+```
+
+#### Object
+
+`object`表示非原始类型，也就是除`number`，`string`，`boolean`，`symbol`，`null`或`undefined`之外的类型。
+
+```typescript
+declare function create(o:object|null):void;
+
+create({ prop: 0 }); // OK
+create(null); // OK
+
+create(42); // Error
+create("string"); // Error
+create(false); // Error
+create(undefined); // Error
+```
+
+#### 类型断言
+
+当遇到主动的类型转换的时候，通过类型断言来告知编辑我确认该操作
+
+```typescript
+let someValue: any = "this is a string";
+//第一种方法
+let strLength: number = (<string>someValue).length;
+//第二种
+let strLength: number = (someValue as string).length;
+```
+
+
+
+### 接口---核心
+
+TypeScript的核心原则之一是对值所具有的*结构*进行类型检查。 它有时被称做“鸭式辨型法”或“结构性子类型化”。
+
+ 在TypeScript里，接口的作用就是为这些类型命名和为你的代码或第三方代码定义契约。
+
+简单的接口示例
+
+```typescript
+function show(obj:{label:string}){
+	console.log(obj.label)
+}
+let obj = {a:123,label:'你好啊'};
+show(obj)
+```
+
+如上述例子，在show方法执行前，类型检查器会查看show中参数，其中show中含有一个参数obj，并要求其对象属性label为string类型，假若方法中传入的对象含有多个属性，但是编译器只会检查那些必需的属性是否存在，并且其类型是否匹配。
+
+以下为具体的接口判断
+
+```typescript
+interface LabelledValue {
+  label: string;
+}
+
+function printLabel(labelledObj: LabelledValue) {
+  console.log(labelledObj.label);
+}
+
+let myObj = {size: 10, label: "Size 10 Object"};
+printLabel(myObj);
+```
+
+`LabelledValue`接口就好比一个名字，用来描述上面例子里的要求。 它代表了有一个 `label`属性且类型为`string`的对象。 需要注意的是，我们在这里并不能像在其它语言里一样，说传给 `printLabel`的对象实现了这个接口。我们只会去关注值的外形。 只要传入的对象满足上面提到的必要条件，那么它就是被允许的。
+
+还有一点值得提的是，类型检查器不会去检查属性的顺序，只要相应的属性存在并且类型也是对的就可以。
+
+
+
+#### 可选属性
+
+接口里的属性不全都是必需的。 有些是只在某些条件下存在，或者根本不存在。 可选属性在应用“option bags”模式时很常用，即给函数传入的参数对象中只有部分属性赋值了
+
+带有可选属性的接口与普通的接口定义差不多，只是在可选属性名字定义的后面加一个`?`符号。
+
+```typescript
+interface SquareConfig {
+    //在后面加了个？来判断是否必须
+  color?: string; //可选属性
+  width?: number;
+}
+
+function createSquare(config: SquareConfig): {color: string; area: number} {
+  let newSquare = {color: "white", area: 100};
+  if (config.color) {
+    newSquare.color = config.color;
+  }
+  if (config.width) {
+    newSquare.area = config.width * config.width;
+  }
+  return newSquare;
+}
+
+let mySquare = createSquare({color: "black"});
+```
+
+好处：
+
+1、以对可能存在的属性进行预定义
+
+2、可以捕获引用了不存在的属性时的错误
+
+
+
+#### 只读属性
+
+一些对象属性只能在对象刚刚创建的时候修改其值。 你可以在属性名前用 `readonly`来指定只读属性
+
+```typescript
+interface Point {
+    readonly x: number;
+    readonly y: number;
+}
+//通过point来限制p1使其不能改变
+let p1: Point = { x: 10, y: 20 };
+p1.x = 5; // error!
+```
+
+TypeScript具有`ReadonlyArray`类型，它与`Array`相似，只是把所有可变方法去掉了，因此可以确保数组创建后再也不能被修改
+
+```typescript
+let a: number[] = [1, 2, 3, 4];
+let ro: ReadonlyArray<number> = a;
+ro[0] = 12; // error!
+ro.push(5); // error!
+ro.length = 100; // error!
+a = ro; // error!
+
+//可以通过重写来实现赋值
+a = ro as number[];
+```
+
+
+
+#### 额外的属性检查
+
+示例：
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+}
+
+function createSquare(config: SquareConfig): { color: string; area: number } {
+    // ...
+}
+//注意：这里colour拼错了，并没有传入color
+let mySquare = createSquare({ colour: "red", width: 100 });
+```
+
+在javascript中该程序已经报错了，但在Typescript中该段代码可能存在bug。对象字面量会被特殊对待而且会经过 额外属性检查，当将它们赋值给变量或作为参数传递的时候。 如果一个对象字面量存在任何“目标类型”不包含的属性时，你会得到一个错误
+
+```typescript
+// error: 'colour' not expected in type 'SquareConfig'
+let mySquare = createSquare({ colour: "red", width: 100 });
+```
+
+那么如何绕开这些方法呢？
+
+第一种--通过类型断言
+
+```typescript
+let mySquare = createSquare({ width: 100, opacity: 0.5 } as SquareConfig);
+```
+
+第二种--添加字符串索引签名
+
+前提：你能够确定这个对象可能具有某些做为特殊用途使用的额外属性
+
+```typescript
+interface SquareConfig {
+    color?: string;
+    width?: number;
+    [propName: string]: any;
+}
+```
+
+第三种--同过赋值来跳开检测
+
+```typescript
+let squareOptions = { colour: "red", width: 100 };
+//squareOptions不会经过额外属性检查
+let mySquare = createSquare(squareOptions);
+```
+
+
+
+#### 函数类型
+
+接口能够描述JavaScript中对象拥有的各种各样的外形。 除了描述带有属性的普通对象外，接口也可以描述函数类型。
+
+为了使用接口表示函数类型，我们需要给接口定义一个调用签名。 它就像是一个只有参数列表和返回值类型的函数定义。参数列表里的每个参数都需要名字和类型。
+
+```typescript
+interface SearchFunc {
+    //(source: string, subString: string) --控制传入参数的类型
+    //boolean --控制返回结果的类型
+  (source: string, subString: string): boolean;
+}
+//使用接口
+let mySearch: SearchFunc;
+//参数列表里的每个参数都需要名字和类型
+mySearch = function(source: string, subString: string) {
+  let result = source.search(subString);
+  return result > -1;
+}
+
+```
+
+对于函数类型的类型检查来说，函数的参数名不需要与接口里定义的名字相匹配
+
+```typescript
+let mySearch: SearchFunc;
+mySearch = function(src: string, sub: string): boolean {
+  let result = src.search(sub);
+  return result > -1;
+}
+```
+
+函数的参数会逐个进行检查，要求对应位置上的参数类型是兼容的。 如果你不想指定类型，TypeScript的类型系统会推断出参数类型，因为函数直接赋值给了 `SearchFunc`类型变量。 
+
+函数的返回值类型是通过其返回值推断出来的（此例是 `false`和`true`）。 如果让这个函数返回数字或字符串，类型检查器会警告我们函数的返回值类型与 `SearchFunc`接口中的定义不匹配。
+
+
+
+#### 可索引的类型
+
+可索引类型具有一个 *索引签名*，它描述了对象索引的类型，还有相应的索引返回值类型
+
+```typescript
+interface StringArray {
+    //[index: number] --控制索引的类型
+    //string --控制返回值的类型
+  [index: number]: string;
+}
+
+let myArray: StringArray;
+myArray = ["Bob", "Fred"];
+//通过数字的索引值来返回字符串的返回值
+let myStr: string = myArray[0];
+```
+
+上面例子里，我们定义了`StringArray`接口，它具有索引签名。 这个索引签名表示了当用 `number`去索引`StringArray`时会得到`string`类型的返回值
+
+typeScript支持两种索引签名：字符串和数字。
+
+可以同时使用两种类型的索引，但是数字索引的返回值必须是字符串索引返回值类型的子类型。 这是因为当使用 `number`来索引时，JavaScript会将它转换成`string`然后再去索引对象。 也就是说用 `100`（一个`number`）去索引等同于使用`"100"`（一个`string`）去索引，因此两者需要保持一致。
+
+
+
+#### 类类型
+
+##### 实现接口
+
+```typescript
+interface ClockInterface {
+    currentTime: Date;
+    //绑定方法
+    setTime(d: Date);
+}
+
+class Clock implements ClockInterface {
+    currentTime: Date;
+     setTime(d: Date) {
+        this.currentTime = d;
+    }
+    constructor(h: number, m: number) { }
+}
+```
+
+接口描述了类的公共部分，而不是公共和私有两部分。 它不会帮你检查类是否具有某些私有成员。
+
+##### 类静态部分与实例部分的区别
+
+要知道类是具有两个类型的：静态部分的类型和实例的类型.
+
+当你用构造器签名去定义一个接口并试图定义一个类去实现这个接口时会得到一个错误
+
+```typescript
+interface ClockConstructor {
+    new (hour: number, minute: number);
+}
+//error:Class 'Clock' incorrectly implements interface 'ClockConstructor'.
+class Clock implements ClockConstructor {
+    currentTime: Date;
+    constructor(h: number, m: number) { }
+}
+```
+
+这里因为当一个类实现了一个接口时，只对其实例部分进行类型检查。 constructor存在于类的静态部分，所以不在检查的范围内。
+
+因此，我们应该直接操作类的静态部分。 看下面的例子，我们定义了两个接口， `ClockConstructor`为构造函数所用和`ClockInterface`为实例方法所用。 为了方便我们定义一个构造函数 `createClock`，它用传入的类型创建实例。
+
+```typescript
+interface ClockConstructor {
+    new (hour: number, minute: number): ClockInterface;
+}
+interface ClockInterface {
+    tick();
+}
+
+function createClock(ctor: ClockConstructor, hour: number, minute: number): ClockInterface {
+    return new ctor(hour, minute);
+}
+
+class DigitalClock implements ClockInterface {
+    constructor(h: number, m: number) { }
+    tick() {
+        console.log("beep beep");
+    }
+}
+class AnalogClock implements ClockInterface {
+    constructor(h: number, m: number) { }
+    tick() {
+        console.log("tick tock");
+    }
+}
+
+let digital = createClock(DigitalClock, 12, 17);
+let analog = createClock(AnalogClock, 7, 32);
+```
+
+因为`createClock`的第一个参数是`ClockConstructor`类型，在`createClock(AnalogClock, 7, 32)`里，会检查`AnalogClock`是否符合构造函数签名。
+
+
+
+#### 继承接口
+
+和类一样，接口也可以相互继承。 这让我们能够从一个接口里复制成员到另一个接口里，可以更灵活地将接口分割到可重用的模块里。
+
+```typescript
+interface Shape {
+    color: string;
+}
+
+interface Square extends Shape {
+    sideLength: number;
+}
+
+let square = <Square>{};
+square.color = "blue";
+square.sideLength = 10;
+```
+
+#### 混合类型
+
+接口能够描述JavaScript里丰富的类型。 因为JavaScript其动态灵活的特点，有时你会希望一个对象可以同时具有上面提到的多种类型。
+
+一个例子就是，一个对象可以同时做为函数和对象使用，并带有额外的属性
+
+```typescript
+interface Counter {
+    (start: number): string;
+    interval: number;
+    reset(): void;
+}
+
+function getCounter(): Counter {
+    let counter = <Counter>function (start: number) { };
+    counter.interval = 123;
+    counter.reset = function () { };
+    return counter;
+}
+
+let c = getCounter();
+c(10);
+c.reset();
+c.interval = 5.0;
+```
+
+#### 接口继承
+
+当接口继承了一个类类型时，它会继承类的成员但不包括其实现。 就好像接口声明了所有类中存在的成员，但并没有提供具体实现一样。 接口同样会继承到类的private和protected成员。 这意味着当你创建了一个接口继承了一个拥有私有或受保护的成员的类时，这个接口类型只能被这个类或其子类所实现（implement）。
+
+这是很有用的，当你有一个很深层次的继承，但是只想你的代码只是针对拥有特定属性的子类起作用的时候。子类除了继承自基类外与基类没有任何联系。 例：
+
+```typescript
+class Control {
+    private state: any;
+}
+//接口继承了类Control的数据，能访问Control的私有数据
+interface SelectableControl extends Control {
+    select(): void;
+}
+
+class Button extends Control {
+    select() { }
+}
+class TextBox extends Control {
+    select() { }
+}
+//以下2个类并非Control的子类，没有select（）方法
+class Image {
+    select() { }
+}
+class Location {
+    select() { }
+}
+```
+
+在上面的例子里，`SelectableControl`包含了`Control`的所有成员，包括私有成员`state`。 因为 `state`是私有成员，所以只能够是`Control`的子类们才能实现`SelectableControl`接口。 因为只有 `Control`的子类才能够拥有一个声明于`Control`的私有成员`state`，这对私有成员的兼容性是必需的。
+
+在`Control`类内部，是允许通过`SelectableControl`的实例来访问私有成员`state`的。 实际上，`SelectableControl`就像`Control`一样，并拥有一个`select`方法。 `Button`和`TextBox`类是`SelectableControl`的子类（因为它们都继承自`Control`并有`select`方法），但`Image`和`Location`类并不是这样的。
